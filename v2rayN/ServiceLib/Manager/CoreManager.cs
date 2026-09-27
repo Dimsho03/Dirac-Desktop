@@ -91,6 +91,23 @@ public class CoreManager
             await WindowsUtils.RemoveTunDevice();
         }
 
+        // Direct DNS before the TUN route: never modify the imported private profile.
+        if (Utils.IsWindows() && mainContext.IsTunEnabled &&
+            node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
+            DiracPinnedCore.IsPinned(Utils.GetBinPath("", nameof(ECoreType.Xray))))
+        {
+            try
+            {
+                if (await DiracDohBootstrap.PrepareAsync(fileName))
+                    await UpdateFunc(false, "Dirac direct DoH completed before TUN routing.");
+            }
+            catch (Exception ex)
+            {
+                Logging.SaveLog(_tag, ex);
+                await UpdateFunc(true, "Dirac DoH bootstrap failed; TUN was not started.");
+                return;
+            }
+        }
         await CoreStart(mainContext);
         await WaitForProxyPort(preContext);
         await CoreStartPreService(preContext);

@@ -1,4 +1,4 @@
-namespace ServiceLib.Manager;
+﻿namespace ServiceLib.Manager;
 
 public sealed class CoreInfoManager
 {
@@ -38,6 +38,14 @@ public sealed class CoreInfoManager
             var vName = Utils.GetBinPath(Utils.GetExeName(name), coreInfo.CoreType.ToString());
             if (File.Exists(vName))
             {
+                if (coreInfo.CoreType == ECoreType.Xray
+                    && DiracPinnedCore.IsPinned(Path.GetDirectoryName(vName)!)
+                    && !DiracPinnedCore.Matches(vName, Path.GetDirectoryName(vName)!))
+                {
+                    msg = "Dirac pinned Xray verification failed: unverified core cannot start.";
+                    Logging.SaveLog(msg);
+                    return string.Empty;
+                }
                 fileName = vName;
                 break;
             }
@@ -63,7 +71,10 @@ public sealed class CoreInfoManager
 
             if (!(Utils.IsWindows() && Environment.OSVersion.Version.Major < 10))
             {
-                lst.Add(ECoreType.Xray);
+                if (IsCheckUpdateSupported(ECoreType.Xray))
+                {
+                    lst.Add(ECoreType.Xray);
+                }
                 lst.Add(ECoreType.mihomo);
                 lst.Add(ECoreType.sing_box);
             }
@@ -77,7 +88,7 @@ public sealed class CoreInfoManager
         return type switch
         {
             ECoreType.v2rayN => !Utils.IsPackagedInstall(),
-            ECoreType.Xray => true,
+            ECoreType.Xray => !DiracPinnedCore.IsPinned(Utils.GetBinPath("", nameof(ECoreType.Xray))),
             ECoreType.mihomo => true,
             ECoreType.sing_box => true,
             _ => false,
