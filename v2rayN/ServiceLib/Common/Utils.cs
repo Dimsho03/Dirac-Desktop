@@ -1081,6 +1081,12 @@ public class Utils
 
     public static string StartupPath()
     {
+        var diracDataRoot = Environment.GetEnvironmentVariable("DIRAC_DATA_ROOT");
+        if (!string.IsNullOrWhiteSpace(diracDataRoot))
+        {
+            return Path.GetFullPath(diracDataRoot);
+        }
+
         if (Environment.GetEnvironmentVariable(Global.LocalAppData) == "1")
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "v2rayN");

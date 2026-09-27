@@ -1,3 +1,5 @@
+using Velopack;
+using v2rayN.Desktop.Services;
 using v2rayN.Desktop.Common;
 using v2rayN.Desktop.Manager;
 
@@ -13,6 +15,9 @@ internal class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
+        DiracUpdateRuntime.ConfigurePersistentDataPath();
+
         if (OnStartup(args) == false)
         {
             Environment.Exit(0);

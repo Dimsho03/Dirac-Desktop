@@ -9,7 +9,12 @@ public class UpdateService(Config config, Func<bool, string, Task> updateFunc)
 
     public async Task CheckUpdateGuiN(bool preRelease)
     {
-        var url = string.Empty;
+                if (Environment.GetEnvironmentVariable("DIRAC_MANAGED_APP_UPDATE") == "1")
+        {
+            await UpdateFunc(false, "Dirac application updates are managed by the Dirac updater.");
+            return;
+        }
+var url = string.Empty;
         var fileName = string.Empty;
 
         DownloadService downloadHandle = new();
@@ -102,7 +107,11 @@ public class UpdateService(Config config, Func<bool, string, Task> updateFunc)
 
     public async Task<UpdateResult> CheckHasUpdateOnly(ECoreType type, bool preRelease)
     {
-        if (!CoreInfoManager.Instance.IsCheckUpdateSupported(type))
+                if (type == ECoreType.v2rayN && Environment.GetEnvironmentVariable("DIRAC_MANAGED_APP_UPDATE") == "1")
+        {
+            return new UpdateResult(false, "Dirac application updates are managed by the Dirac updater.");
+        }
+if (!CoreInfoManager.Instance.IsCheckUpdateSupported(type))
         {
             return new UpdateResult(false, ResUI.MsgNotSupport);
         }
