@@ -73,3 +73,8 @@ This repository includes substantial code originating from [v2rayN](https://gith
 - [v2rayN](https://github.com/2dust/v2rayN) — upstream desktop client and architecture.
 - [Xray-core](https://github.com/XTLS/Xray-core) — upstream core project used as the basis for Dirac's pinned custom runtime.
 - [Velopack](https://github.com/velopack/velopack) — application packaging and update framework.
+## Russia-direct routing
+
+Dirac includes a pinned, SHA-256-checked Russia-direct TUN preset. Important
+Russian services and banks use the physical network, while blocked sites and
+other traffic use the VPN. See [routing policy and GeoData provenance](docs/ru-routing.md).

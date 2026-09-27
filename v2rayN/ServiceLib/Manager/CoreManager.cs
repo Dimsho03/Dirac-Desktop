@@ -82,6 +82,13 @@ public class CoreManager
         await UpdateFunc(false, $"{node.GetSummary()}");
         await UpdateFunc(false, $"{Utils.GetRuntimeInfo()}");
         await UpdateFunc(false, string.Format(ResUI.StartService, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")));
+
+        var xrayDirectory = Utils.GetBinPath("", nameof(ECoreType.Xray));
+        var diracTunEligible = Utils.IsWindows() && mainContext.IsTunEnabled &&
+                               node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
+                               DiracPinnedCore.IsPinned(xrayDirectory) &&
+                               await DiracDohBootstrap.IsEligibleFileAsync(fileName);
+
         await CoreStop();
         await Task.Delay(100);
 
@@ -91,24 +98,63 @@ public class CoreManager
             await WindowsUtils.RemoveTunDevice();
         }
 
-        // Direct DNS before the TUN route: never modify the imported private profile.
-        if (Utils.IsWindows() && mainContext.IsTunEnabled &&
-            node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
-            DiracPinnedCore.IsPinned(Utils.GetBinPath("", nameof(ECoreType.Xray))))
+        var diracDnsGuardApplied = false;
+        if (diracTunEligible)
         {
             try
             {
-                if (await DiracDohBootstrap.PrepareAsync(fileName))
-                    await UpdateFunc(false, "Dirac direct DoH completed before TUN routing.");
+                if (!await DiracDohBootstrap.PrepareAsync(fileName, false))
+                {
+                    throw new InvalidOperationException("Generated Dirac TUN config was no longer eligible for bootstrap.");
+                }
+
+                // RU-first routing is applied to the ephemeral Xray config only.
+                // No Windows DNS/routing changes occur until pinned geodata validates.
+                await DiracRussiaRouting.ApplyFileAsync(fileName, Utils.GetBinPath(""));
+                await UpdateFunc(false, "Dirac Russia-direct routing verified.");
+                diracDnsGuardApplied = await DiracWindowsDnsGuard.ApplyAsync();
+                await UpdateFunc(false, "Dirac DoH bootstrap and DNS guard prepared before TUN routing.");
             }
             catch (Exception ex)
             {
                 Logging.SaveLog(_tag, ex);
-                await UpdateFunc(true, "Dirac DoH bootstrap failed; TUN was not started.");
+                try
+                {
+                    await DiracWindowsDnsGuard.RestoreAsync();
+                }
+                catch (Exception restoreException)
+                {
+                    Logging.SaveLog(_tag, restoreException);
+                }
+
+                await UpdateFunc(true, "Dirac bootstrap/DNS guard failed; TUN was not started.");
                 return;
             }
         }
+
         await CoreStart(mainContext);
+        if (diracDnsGuardApplied && (_processService is null || _processService.HasExited))
+        {
+            await CoreStop();
+            await UpdateFunc(true, "Dirac TUN core failed to start; DNS settings were restored.");
+            return;
+        }
+
+        if (diracDnsGuardApplied)
+        {
+            try
+            {
+                await DiracWindowsDnsGuard.ReassertAsync();
+                await UpdateFunc(false, "Dirac TUN and DNS guard are active.");
+            }
+            catch (Exception ex)
+            {
+                Logging.SaveLog(_tag, ex);
+                await CoreStop();
+                await UpdateFunc(true, "Dirac DNS guard could not be reasserted after TUN startup; TUN was stopped.");
+                return;
+            }
+        }
         await WaitForProxyPort(preContext);
         await CoreStartPreService(preContext);
 
@@ -189,6 +235,22 @@ public class CoreManager
         {
             Logging.SaveLog(_tag, ex);
         }
+        finally
+        {
+            if (Utils.IsWindows())
+            {
+                try
+                {
+                    await DiracWindowsDnsGuard.RestoreAsync();
+                }
+                catch (Exception ex)
+                {
+                    Logging.SaveLog(_tag, ex);
+                }
+
+
+            }
+        }
     }
 
     #region Private
@@ -267,7 +329,7 @@ public class CoreManager
 
                 var read = await stream.ReadAsync(buf.AsMemory(0, 2), linkedToken);
 
-                // Server selection: VER=5, METHOD=0x00 — proxy is fully ready
+                // Server selection: VER=5, METHOD=0x00 - proxy is fully ready
                 if (read == 2 && buf[0] == 0x05)
                 {
                     return;

@@ -7,9 +7,9 @@ internal static class DiracUpdateRuntime
 {
     public static void ConfigurePersistentDataPath()
     {
-                Environment.SetEnvironmentVariable("DIRAC_MANAGED_APP_UPDATE", "1", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("DIRAC_MANAGED_APP_UPDATE", "1", EnvironmentVariableTarget.Process);
 
-if (!OperatingSystem.IsWindows() || !VelopackLocator.IsCurrentSet)
+        if (!OperatingSystem.IsWindows() || !VelopackLocator.IsCurrentSet)
         {
             return;
         }
@@ -24,6 +24,13 @@ if (!OperatingSystem.IsWindows() || !VelopackLocator.IsCurrentSet)
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "Dirac");
 
+        // In an installed Velopack release, copy only the versioned public
+        // runtime bin folder (including the release-pinned GeoIP/GeoSite data)
+        // into the separate persistent user data root before Xray starts.
+        Environment.SetEnvironmentVariable(
+            Global.LocalAppData,
+            "1",
+            EnvironmentVariableTarget.Process);
         Environment.SetEnvironmentVariable(
             "DIRAC_DATA_ROOT",
             dataRoot,

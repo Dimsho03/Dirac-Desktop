@@ -57,6 +57,11 @@ public static class DiracDohBootstrap
             && !(a[0] == 100 && a[1] is >= 64 and <= 127);
     }
 
+    public static async Task<bool> IsEligibleFileAsync(string generatedConfig, CancellationToken ct = default)
+    {
+        var root = JsonNode.Parse(await File.ReadAllTextAsync(generatedConfig, ct));
+        return root is not null && IsEligible(root);
+    }
     public static bool TryRewrite(JsonNode root, IPAddress ip)
     {
         if (!IsPublicIPv4(ip) || !IsEligible(root)) return false;
@@ -66,7 +71,10 @@ public static class DiracDohBootstrap
         return true;
     }
 
-    public static async Task<bool> PrepareAsync(string generatedConfig, CancellationToken ct = default)
+    public static Task<bool> PrepareAsync(string generatedConfig, CancellationToken ct = default)
+        => PrepareAsync(generatedConfig, skipReachabilityProbe: false, ct);
+
+    public static async Task<bool> PrepareAsync(string generatedConfig, bool skipReachabilityProbe, CancellationToken ct = default)
     {
         var root = JsonNode.Parse(await File.ReadAllTextAsync(generatedConfig, ct))
             ?? throw new InvalidDataException("Generated Xray JSON is empty.");
@@ -74,15 +82,18 @@ public static class DiracDohBootstrap
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
         deadline.CancelAfter(TimeSpan.FromSeconds(28));
         var ips = await ResolveDirectDoH(deadline.Token);
-        IPAddress? reachable = null;
-        foreach (var ip in ips)
+        IPAddress? reachable = skipReachabilityProbe ? ips.FirstOrDefault() : null;
+        if (!skipReachabilityProbe)
         {
-            using var tcp = new TcpClient(AddressFamily.InterNetwork);
-            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(deadline.Token);
-            timeout.CancelAfter(TimeSpan.FromMilliseconds(1900));
-            try { await tcp.ConnectAsync(ip, 443, timeout.Token); reachable = ip; break; }
-            catch (OperationCanceledException) when (!deadline.IsCancellationRequested) { }
-            catch (SocketException) { }
+            foreach (var ip in ips)
+            {
+                using var tcp = new TcpClient(AddressFamily.InterNetwork);
+                using var timeout = CancellationTokenSource.CreateLinkedTokenSource(deadline.Token);
+                timeout.CancelAfter(TimeSpan.FromMilliseconds(1900));
+                try { await tcp.ConnectAsync(ip, 443, timeout.Token); reachable = ip; break; }
+                catch (OperationCanceledException) when (!deadline.IsCancellationRequested) { }
+                catch (SocketException) { }
+            }
         }
         if (reachable == null || !TryRewrite(root, reachable))
             throw new IOException("Dirac pre-TUN bootstrap returned no reachable public edge.");
