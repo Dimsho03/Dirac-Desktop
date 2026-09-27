@@ -310,9 +310,14 @@ public static class DiracWindowsDnsGuard
         }
     }
 
-    [SupportedOSPlatform("windows")]
+
     private static bool UsesDhcpDns(string interfaceId)
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return false;
+        }
+
         var id = interfaceId.Trim().Trim('{', '}');
         using var key = Registry.LocalMachine.OpenSubKey(
             $@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\{{{id}}}",
