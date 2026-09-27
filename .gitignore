@@ -402,3 +402,18 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Dirac private/runtime data
+.env
+.env.*
+.secrets/
+private/
+**/guiConfigs/
+**/binConfigs/
+**/guiBackups/
+**/guiLogs/
+**/guiTemps/
+*.pem
+*.key
+*.p12
+*.pfx

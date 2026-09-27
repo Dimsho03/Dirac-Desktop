@@ -1,102 +1,49 @@
-name: Bug 报告
-description: 在提出问题前请先自行排除服务器端问题和升级到最新客户端，同时也请通过搜索确认是否有人提出过相同问题。
-title: "[Bug]: "
-labels: ["bug"]
+name: Bug report
+description: Report a reproducible problem in Dirac Desktop
+title: "[Bug] "
+labels:
+  - bug
 body:
   - type: markdown
     attributes:
       value: |
-        ### 报告 Bug 前请务必确认以下事项：
-        > ** **
-        > **✓ 已自行排除服务器端问题。**
-        > **✓ 已升级到最新客户端版本。**
-        > **✓ 已通过搜索确认没有人提出过相同问题。**
-        > **✓ 已确认自己的电脑系统环境是受支持的。**
-
-        ---
-
+        Do not attach real VPN profiles, UUIDs, passwords, private keys, access tokens, or unredacted credentials.
   - type: input
-    id: "os-version"
+    id: version
     attributes:
-      label: "操作系统 / v2rayN / Core 版本"
-      description: "操作系统 / v2rayN / Core 版本"
+      label: Dirac version / commit
+      placeholder: e.g. 0.1.0 or commit SHA
     validations:
       required: true
-
   - type: input
-    id: "expectation"
+    id: windows
     attributes:
-      label: "预期情况"
-      description: "描述你认为应该发生什么"
+      label: Windows version
+      placeholder: e.g. Windows 11 24H2 x64
     validations:
       required: true
-
   - type: textarea
-    id: "describe-the-bug"
+    id: expected
     attributes:
-      label: "实际情况"
-      description: "描述实际发生了什么"
+      label: Expected behavior
     validations:
       required: true
-
   - type: textarea
-    id: "reproduction-method"
+    id: actual
     attributes:
-      label: "复现方法"
-      description: "在BUG出现前执行了哪些操作"
-      placeholder: "标序号"
+      label: Actual behavior
     validations:
       required: true
-
   - type: textarea
-    id: "gui-log"
+    id: reproduce
     attributes:
-      label: "软件日志"
-      description: "位置在软件当前目录下的guiLogs"
-      placeholder: "在日志开始和结束位置粘贴冒号后的内容到这："
+      label: Steps to reproduce
     validations:
       required: true
-
   - type: textarea
-    id: "core-log"
+    id: logs
     attributes:
-      label: "内核日志"
-      description: "位置在软件主界面的信息框内"
-      placeholder: "在信息框内鼠标右键复制全部信息粘贴在这："
-    validations:
-      required: true
-
-  - type: textarea
-    id: "more"
-    attributes:
-      label: "额外信息"
-      description: "可选"
+      label: Relevant logs
+      description: Redact private endpoints, UUIDs, keys, tokens, and credentials before posting.
     validations:
       required: false
-
-  - type: checkboxes
-    id: "latest-version"
-    attributes:
-      label: "我确认已更新至最新版本"
-      description: "否则请更新后尝试"
-      options:
-        - label: 是
-          required: true
-
-  - type: checkboxes
-    id: "issues"
-    attributes:
-      label: "我确认已查询历史issues"
-      description: "否则请查询后提出"
-      options:
-        - label: 是
-          required: true
-
-  - type: checkboxes
-    id: "system-version"
-    attributes:
-      label: "我确认系统版本是受支持的"
-      description: "否则请切换后尝试"
-      options:
-        - label: 是
-          required: true

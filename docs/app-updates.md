@@ -11,7 +11,7 @@ Scope: Windows application binary updates only. Profile / endpoint recovery is i
 - Channels are architecture-specific: win-x64-stable and win-x64-beta.
 - Dimsho.Dirac.Desktop is the initial package id. Stable/beta are channels, not separate installations.
 - The backend accepts ordered update endpoints. It does not contain a GitHub token or any VPN profile data.
-- GitHub can only be a client update source after releases are public; the current private repo must never cause a PAT to be embedded in Dirac.
+- Public GitHub Releases from Dimsho03/Dirac-Desktop can be used as a client update source without embedding a GitHub access token.
 - A static HTTPS mirror can be added as another endpoint later.
 - Publishing is deliberately not automatic yet.
 - Release packaging is fail-closed: the pack script requires the pinned custom Xray and signed Wintun hashes before Velopack can produce an installer/update feed.
@@ -28,7 +28,7 @@ Scope: Windows application binary updates only. Profile / endpoint recovery is i
 
 ## Before first public release
 
-- Choose the public update origin (public GitHub release repository and/or static HTTPS mirror).
+- Wire the public Dimsho03/Dirac-Desktop GitHub Releases feed as the primary application-update origin; an independent static HTTPS mirror may be added later.
 - Add UI for check/download/apply plus release notes and progress.
 - Perform installed 0.1.0 -> 0.1.1 update and rollback/recovery tests.
 - Confirm user data survives an update.

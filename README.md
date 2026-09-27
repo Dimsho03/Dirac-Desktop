@@ -1,80 +1,75 @@
-# v2rayN
+# Dirac Desktop
 
-### A GUI client for Windows, Linux and macOS. Support [Xray](https://github.com/XTLS/Xray-core) and [sing-box](https://github.com/SagerNet/sing-box) and [others](https://github.com/2dust/v2rayN/wiki/List-of-supported-cores)
+Dirac Desktop is an experimental Windows x64 VPN client derived from [v2rayN](https://github.com/2dust/v2rayN).
 
-[![CodeFactor](https://www.codefactor.io/repository/github/2dust/v2rayn/badge)](https://www.codefactor.io/repository/github/2dust/v2rayn)
-[![Release](https://img.shields.io/github/v/release/2dust/v2rayN?logo=github&label=Release)](https://github.com/2dust/v2rayN/releases)
-[![Downloads](https://img.shields.io/github/downloads/2dust/v2rayN/latest/total?logo=github&label=Downloads)](https://github.com/2dust/v2rayN/releases)
-[![Telegram](https://img.shields.io/badge/Telegram-Chat-26A5E4?logo=telegram)](https://t.me/v2rayn)
- 
-[![Windows](https://img.shields.io/badge/Windows-supported-0078D6?logo=windows)](https://github.com/2dust/v2rayN) 
-[![Linux](https://img.shields.io/badge/Linux-supported-FCC624?logo=linux&logoColor=000)](https://github.com/2dust/v2rayN) 
-[![macOS](https://img.shields.io/badge/macOS-supported-000000?logo=apple)](https://github.com/2dust/v2rayN) 
-[![GPG Signed](https://img.shields.io/badge/GPG-signed-4B32C3?logo=gnuprivacyguard)](https://github.com/2dust/v2rayN)
+The project keeps the mature v2rayN desktop and service architecture while developing Dirac-specific networking, TUN, DNS bootstrap, update, and custom-core integration.
 
+> Status: active development. There is no production-ready public release yet.
 
----
+## Upstream
 
-## Download / 下载
+Dirac Desktop is based on the open-source [2dust/v2rayN](https://github.com/2dust/v2rayN) project.
 
-Download the latest release here:
+The current Dirac codebase was started from the v2rayN 7.24.8 baseline and intentionally retains much of the upstream project structure, including the GlobalHotKeys submodule. Dirac-specific modifications are maintained in this repository.
 
-在这里下载最新版本：
+If a problem reproduces in unmodified v2rayN, please also consult the upstream project and its documentation.
 
-[https://github.com/2dust/v2rayN/releases](https://github.com/2dust/v2rayN/releases)
+## Current scope
 
+Dirac currently targets Windows x64.
 
-> [!TIP]
-> v2rayN is the desktop version. For the mobile version, please visit the v2rayNG \
-> v2rayN 是电脑版，手机版请访问 v2rayNG
->
-> https://github.com/2dust/v2rayNG
+Development includes:
 
----
+- full IPv4 TUN mode;
+- Dirac-specific DNS/DoH bootstrap logic;
+- a pinned custom Xray runtime used by Dirac builds;
+- controlled application updates based on Velopack;
+- explicit separation between application updates and future profile-recovery logic.
 
-## Documentation / 使用文档
+The release pipeline is intentionally fail-closed: a Dirac update package must contain the expected pinned Xray and Wintun binaries. Private VPN profiles, credentials, UUIDs, keys, and user runtime configuration are not part of this repository.
 
-Read the Wiki for usage guides and configuration details.
+## Build
 
-请阅读 Wiki 获取使用说明和配置教程。
+Requirements:
 
-[https://github.com/2dust/v2rayN/wiki](https://github.com/2dust/v2rayN/wiki)
+- Git with submodule support;
+- .NET 10 SDK;
+- Windows for the current desktop target.
 
----
+Clone with submodules, then build the desktop project:
 
-## Supported Platforms / 支持平台
+    git clone --recurse-submodules https://github.com/Dimsho03/Dirac-Desktop.git
+    cd Dirac-Desktop
+    dotnet build v2rayN/v2rayN.Desktop/v2rayN.Desktop.csproj -c Release
 
-| Platform / 平台 | x64 | x86 | arm64 | riscv64 | loong64 |
-| --- | --- | --- | --- | --- | --- |
-| Windows | ✅ | ✅ | ✅ | - | - |
-| Linux | ✅ | - | ✅ | ✅ | ✅ |
-| macOS | ✅ | - | ✅ | - | - |
+A normal source build compiles the desktop application. Creating a distributable Dirac release additionally requires the pinned Dirac Xray/Wintun release inputs expected by scripts/Pack-Dirac-AppUpdate.ps1.
 
-Minimum OS requirements: [Release files introduction](https://github.com/2dust/v2rayN/wiki/Release-files-introduction) / 最低系统要求：[发布文件介绍](https://github.com/2dust/v2rayN/wiki/Release-files-introduction)
+## Tests
 
----
+ServiceLib tests are located in v2rayN/ServiceLib.Tests. The repository CI builds the Windows desktop target and runs the test suite on every relevant push or pull request.
 
-## GPG Verification / GPG 签名校验
+## Application updates
 
-Release files are signed with GPG to verify authenticity and integrity, helping prevent mirror, ISP, or CDN hijacking.
+The application-update foundation uses Velopack with separate stable and beta channels. Mutable application data is kept outside Velopack's replaceable application directory.
 
-发布文件已使用 GPG 签名，可用于校验文件真实性与完整性，预防镜像站、运营商或 CDN 劫持。
+Design notes are in [docs/app-updates.md](docs/app-updates.md).
 
-### Fingerprint / 公钥指纹
+Profile/endpoint recovery is intentionally a separate subsystem and is not implemented by the application updater.
 
-```text
-7694 5E9F 3E9A 168F 8070 F195 805D 661C
-134D FAF6 8903 C199 463C 31E5 AE90 3AE0
-```
+## Security and issue reports
 
----
+Do not publish real VPN profiles, UUIDs, passwords, private keys, access tokens, cookies, or other credentials in issues, pull requests, logs, or test fixtures.
 
-## Community / 社区
+When reporting a problem, redact private endpoint data unless it is strictly necessary and safe to disclose.
 
-Telegram Group / Telegram 群组：
+## License
 
-[https://t.me/v2rayN](https://t.me/v2rayN)
+Dirac Desktop is distributed under the [GNU General Public License v3.0](LICENSE), consistent with its v2rayN-derived codebase.
 
-Telegram Channel / Telegram 频道：
+This repository includes substantial code originating from [v2rayN](https://github.com/2dust/v2rayN). Copyright and license notices in upstream and third-party components remain applicable to those components.
 
-[https://t.me/github_2dust](https://t.me/github_2dust)
+## Acknowledgements
+
+- [v2rayN](https://github.com/2dust/v2rayN) — upstream desktop client and architecture.
+- [Xray-core](https://github.com/XTLS/Xray-core) — upstream core project used as the basis for Dirac's pinned custom runtime.
+- [Velopack](https://github.com/velopack/velopack) — application packaging and update framework.

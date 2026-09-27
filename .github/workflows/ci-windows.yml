@@ -1,0 +1,45 @@
+name: Windows CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'dirac-desktop/**'
+    paths:
+      - 'v2rayN/**'
+      - '.github/workflows/ci-windows.yml'
+      - 'global.json'
+  pull_request:
+    paths:
+      - 'v2rayN/**'
+      - '.github/workflows/ci-windows.yml'
+      - 'global.json'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build desktop
+        shell: pwsh
+        run: dotnet build .\v2rayN\v2rayN.Desktop\v2rayN.Desktop.csproj -c Release --nologo
+
+      - name: Build tests
+        shell: pwsh
+        run: dotnet build .\v2rayN\ServiceLib.Tests\ServiceLib.Tests.csproj -c Release --nologo
+
+      - name: Run ServiceLib tests
+        shell: pwsh
+        run: dotnet .\v2rayN\ServiceLib.Tests\bin\Release\net10.0\ServiceLib.Tests.dll
