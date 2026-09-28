@@ -17,6 +17,12 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
     private bool _blCloseByUser = false;
     private readonly DiracAppUpdateService _diracUpdates = new();
     private bool _diracUpdateBusy;
+    private bool _diracPowerBusy;
+    private DateTime? _diracConnectStartedUtc;
+    private readonly Avalonia.Threading.DispatcherTimer _diracDashboardTimer = new()
+    {
+        Interval = TimeSpan.FromSeconds(1)
+    };
 
     public MainWindow()
     {
@@ -34,6 +40,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         menuDiracBetaChannel.Click += MenuDiracBetaChannel_Click;
         btnNewUpdate.Click += MenuDiracCheckUpdate_Click;
         RefreshDiracUpdateChannelMenu();
+        WireDiracDashboard();
         menuBackupAndRestore.Click += MenuBackupAndRestore_Click;
         menuClose.Click += MenuClose_Click;
 
@@ -156,7 +163,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
 
         if (Utils.IsWindows())
         {
-            Title = $"{Utils.GetVersion()} - {(Utils.IsAdministrator() ? ResUI.RunAsAdmin : ResUI.NotRunAsAdmin)}";
+            Title = $"Dirac Desktop · {Utils.GetVersion()} - {(Utils.IsAdministrator() ? ResUI.RunAsAdmin : ResUI.NotRunAsAdmin)}";
 
             if (!Design.IsDesignMode)
             {
@@ -166,7 +173,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         }
         else
         {
-            Title = $"{Utils.GetVersion()}";
+            Title = $"Dirac Desktop · {Utils.GetVersion()}";
             menuAddServerViaScan.IsVisible = false;
         }
 
@@ -176,6 +183,188 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         }
 
         AddHelpMenuItem();
+    }
+
+    // Keep the previously tested v2rayN/Xray engine intact. This first
+    // dashboard is only another view of its managed state and commands.
+    private void WireDiracDashboard()
+    {
+        diracHome.ConnectRequested += async (_, _) => await ToggleDiracConnectionAsync();
+        diracHome.ProfilesRequested += (_, _) => ShowDiracAdvancedWorkspace("profiles");
+        diracHome.DiagnosticsRequested += (_, _) => ShowDiracAdvancedWorkspace("logs");
+        diracHome.AdvancedRequested += (_, _) => ShowDiracAdvancedWorkspace("advanced");
+        diracHome.ImportFileRequested += async (_, _) =>
+        {
+            await ViewModel.ImportDiracProfileFileAsync();
+            RefreshDiracDashboard();
+        };
+        diracHome.ImportClipboardRequested += async (_, _) =>
+        {
+            await ViewModel.ImportDiracProfileClipboardAsync();
+            RefreshDiracDashboard();
+        };
+        diracHome.RussiaDirectRequested += async (_, _) => await SetDiracDashboardRouteAsync(true);
+        diracHome.FullVpnRequested += async (_, _) => await SetDiracDashboardRouteAsync(false);
+        diracHome.StableRequested += async (_, _) =>
+        {
+            await SelectDiracUpdateChannelAsync(beta: false);
+            RefreshDiracDashboard();
+        };
+        diracHome.BetaRequested += async (_, _) =>
+        {
+            await SelectDiracUpdateChannelAsync(beta: true);
+            RefreshDiracDashboard();
+        };
+        diracHome.CheckUpdateRequested += (_, _) => MenuDiracCheckUpdate_Click(diracHome, new RoutedEventArgs());
+        btnBackDirac.Click += (_, _) =>
+        {
+            legacyWorkspace.IsVisible = false;
+            diracHome.IsVisible = true;
+            RefreshDiracDashboard();
+        };
+        _diracDashboardTimer.Tick += (_, _) => RefreshDiracDashboard();
+    }
+
+    private void ShowDiracAdvancedWorkspace(string section)
+    {
+        diracHome.IsVisible = false;
+        legacyWorkspace.IsVisible = true;
+
+        if (section == "logs")
+        {
+            switch (_config.UiItem.MainGirdOrientation)
+            {
+                case EGirdOrientation.Horizontal: tabMain.SelectedIndex = 0; break;
+                case EGirdOrientation.Vertical: tabMain1.SelectedIndex = 0; break;
+                default: tabMain2.SelectedIndex = 1; break;
+            }
+        }
+        else if (section == "profiles" && _config.UiItem.MainGirdOrientation == EGirdOrientation.Tab)
+        {
+            tabMain2.SelectedIndex = 0;
+        }
+    }
+
+    private async Task ToggleDiracConnectionAsync()
+    {
+        if (_diracPowerBusy || ViewModel is null)
+        {
+            return;
+        }
+
+        _diracPowerBusy = true;
+        try
+        {
+            var status = ViewModel.StatusBarViewModel;
+            if (status.EnableTun || _config.TunModeItem.EnableTun)
+            {
+                status.EnableTun = false;
+                RefreshDiracDashboard();
+                return;
+            }
+            if (CoreManager.Instance.ActiveDiracRussiaDirect.HasValue)
+            {
+                NotifyDiracUpdate("Дождитесь завершения отключения VPN.", NotificationType.Warning);
+                return;
+            }
+
+            var profile = await ConfigHandler.GetDefaultServer(_config);
+            if (profile is null)
+            {
+                NotifyDiracUpdate("Сначала импортируйте профиль Dirac из файла или буфера.", NotificationType.Warning);
+                return;
+            }
+            if (profile.ConfigType != EConfigType.Custom || profile.CoreType != ECoreType.Xray
+                || !await DiracDohBootstrap.IsEligibleFileAsync(Utils.GetConfigPath(profile.Address)))
+            {
+                NotifyDiracUpdate(
+                    "Нужен совместимый полный JSON-профиль Dirac, полученный от владельца.",
+                    NotificationType.Warning);
+                return;
+            }
+
+            if (Utils.IsWindows() && !Utils.IsAdministrator())
+            {
+                NotifyDiracUpdate("Для native TUN Dirac запросит запуск от администратора.");
+            }
+
+            _diracConnectStartedUtc = DateTime.UtcNow;
+            status.EnableTun = true; // Original VM persists state and owns reload/elevation.
+            RefreshDiracDashboard();
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog("Dirac dashboard connection action failed: " + ex.GetType().Name);
+            NotifyDiracUpdate("Не удалось переключить VPN. Проверьте журнал.", NotificationType.Error);
+        }
+        finally
+        {
+            _diracPowerBusy = false;
+        }
+    }
+
+    private async Task SetDiracDashboardRouteAsync(bool russiaDirect)
+    {
+        if (ViewModel is null)
+        {
+            return;
+        }
+        var state = GetDiracDashboardState();
+        if (state is EDiracDashboardState.Connecting or EDiracDashboardState.Disconnecting)
+        {
+            NotifyDiracUpdate("Дождитесь завершения переключения VPN.", NotificationType.Warning);
+            return;
+        }
+
+        await ViewModel.SetDiracRouteModeAsync(russiaDirect);
+        RefreshDiracDashboard();
+    }
+
+    private EDiracDashboardState GetDiracDashboardState()
+    {
+        var requested = _config.TunModeItem.EnableTun;
+        var active = CoreManager.Instance.ActiveDiracRussiaDirect;
+        var running = CoreManager.Instance.IsMainCoreRunning;
+
+        if (requested && !active.HasValue && _diracConnectStartedUtc is null)
+        {
+            _diracConnectStartedUtc = DateTime.UtcNow;
+        }
+        if (!requested || active.HasValue)
+        {
+            _diracConnectStartedUtc = null;
+        }
+
+        return DiracDashboardState.Get(requested, running, active,
+            _diracConnectStartedUtc.HasValue
+                ? DateTime.UtcNow - _diracConnectStartedUtc.Value
+                : TimeSpan.Zero);
+    }
+
+    private void RefreshDiracDashboard()
+    {
+        if (ViewModel is null || !Utils.IsWindows())
+        {
+            return;
+        }
+
+        var current = GetDiracDashboardState();
+        var display = current switch
+        {
+            EDiracDashboardState.Connecting => DiracConnectionDisplay.Connecting,
+            EDiracDashboardState.Connected => DiracConnectionDisplay.Connected,
+            EDiracDashboardState.Disconnecting => DiracConnectionDisplay.Disconnecting,
+            EDiracDashboardState.Unavailable => DiracConnectionDisplay.Unavailable,
+            _ => DiracConnectionDisplay.Disconnected
+        };
+
+        diracHome.SetConnectionState(display);
+        diracHome.SetRouting(
+            _config.TunModeItem.DiracRussiaDirect,
+            current is not EDiracDashboardState.Connecting and not EDiracDashboardState.Disconnecting,
+            current == EDiracDashboardState.Connected);
+        diracHome.SetUpdateChannel(_config.CheckUpdateItem.DiracBetaChannel, _diracUpdateBusy);
+        diracHome.SetProfileCount(ViewModel.ProfilesViewModel.ProfileItems.Count);
     }
 
     #region Event
@@ -528,6 +717,8 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             ShowHideWindow(false);
         }
         RestoreUI();
+        RefreshDiracDashboard();
+        _diracDashboardTimer.Start();
     }
 
     private void RestoreUI()
