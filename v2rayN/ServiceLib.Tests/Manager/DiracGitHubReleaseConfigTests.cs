@@ -38,8 +38,8 @@ public class DiracGitHubReleaseConfigTests
             DiracBetaChannel = false
         };
 
-        await DiracGitHubReleaseConfig.Channel(config.DiracBetaChannel)
-            .Should().Be(DiracGitHubReleaseConfig.StableChannel);
+        await (DiracGitHubReleaseConfig.Channel(config.DiracBetaChannel)
+               == DiracGitHubReleaseConfig.StableChannel).Should().BeTrue();
     }
 
     [Test]
