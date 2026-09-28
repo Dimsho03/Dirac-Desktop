@@ -116,7 +116,7 @@
         </Border>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
+                      HorizontalScrollBarVisibility="Auto">
             <StackPanel Margin="36,29,38,30" Spacing="21">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Spacing="6">
