@@ -13,7 +13,7 @@ Scope: Windows application binary updates only. Profile / endpoint recovery is i
 - The backend accepts ordered update endpoints. It does not contain a GitHub token or any VPN profile data.
 - The first client endpoint is now hardcoded to unauthenticated `https://github.com/Dimsho03/Dirac-Desktop` GitHub Releases; the active app update channel is `win-x64-stable` by default, with `win-x64-beta` by explicit user opt-in.
 - The app-update beta choice is persisted independently of v2rayN core prerelease updates; no profile subscription or replacement is implied.
-- A public `Dimsho03/Dirac-Desktop` GitHub Releases feed can be read without embedding a GitHub access token. The source repository is currently **private**: public clients cannot update yet. Keep the repository private until its source/credential audit and explicit publication decision are complete; alternatively change the client to a separate public release repository in a reviewed source commit.
+- The source repository `Dimsho03/Dirac-Desktop` was made **public on 2026-09-28**, following full Dirac commit/branch secret scans. Public GitHub Releases can be read without embedding a GitHub access token. **No application release has been published yet:** public source access alone does not provide an installable update.
 - A static HTTPS mirror can be added as another endpoint later.
 - Publishing is deliberately not automatic: `scripts/Publish-DiracGitHubRelease.ps1` validates local Velopack manifests, SHA-256 and private-payload exclusion by default without writing GitHub data. It only creates a **draft** when explicitly called with `-PublishDraft`, after the repo is public and the installer has a valid Authenticode signature.
 - Release packaging is fail-closed: the pack script requires the pinned custom Xray and signed Wintun hashes before Velopack can produce an installer/update feed.
@@ -30,7 +30,7 @@ Scope: Windows application binary updates only. Profile / endpoint recovery is i
 
 ## Before first public release
 
-- GitHub Releases is now the first app-update origin in the desktop code. Make source releases publicly accessible before shipping to friends; do not embed a PAT. An independent mirror is deliberately deferred.
+- GitHub Releases is now the first app-update origin in the desktop code. The source repository is public, but first-release packaging and publication remain separate work. Do not embed a PAT. An independent mirror is deliberately deferred.
 - The legacy Avalonia Help menu now offers tokenless GitHub check/download/apply with quarter-step progress and Stable/Beta choice. The redesigned UI still needs to add release notes, an explicit progress panel and a cancellation path.
 - HOME successfully completed a separate installed 0.1.2 -> 0.1.3 offline Velopack delta update with restart, pinned runtime hashes and data persistence. A real *public GitHub-origin* installed update and rollback/recovery remain to be tested after the first public release.
 - Confirm user data survives an update.
@@ -59,7 +59,7 @@ Validate the release package **without uploading anything**:
 .\scripts\Publish-DiracGitHubRelease.ps1 -Version 0.1.4 -Channel stable -FeedDir C:\path\to\validated-feed
 ```
 
-After the repo is publicly accessible, the installer is Authenticode-signed,
+After verifying the public repository's source tag, the installer is Authenticode-signed,
 the source commit matches the package, and the release notes have been
 reviewed, upload a *draft*:
 
