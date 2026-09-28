@@ -108,10 +108,14 @@ public class CoreManager
                     throw new InvalidOperationException("Generated Dirac TUN config was no longer eligible for bootstrap.");
                 }
 
-                // RU-first routing is applied to the ephemeral Xray config only.
-                // No Windows DNS/routing changes occur until pinned geodata validates.
-                await DiracRussiaRouting.ApplyFileAsync(fileName, Utils.GetBinPath(""));
-                await UpdateFunc(false, "Dirac Russia-direct routing verified.");
+                // Select the user's stored TUN policy on generated config only.
+                // Both modes retain direct-DoH bootstrap and Windows DNS guard;
+                // RU-direct additionally validates release-pinned geodata.
+                var russiaDirect = _config.TunModeItem.DiracRussiaDirect;
+                await DiracRouteMode.ApplyFileAsync(fileName, Utils.GetBinPath(""), russiaDirect);
+                await UpdateFunc(false, russiaDirect
+                    ? "Dirac Russia-direct TUN routing verified."
+                    : "Dirac full VPN TUN routing prepared.");
                 diracDnsGuardApplied = await DiracWindowsDnsGuard.ApplyAsync();
                 await UpdateFunc(false, "Dirac DoH bootstrap and DNS guard prepared before TUN routing.");
             }
