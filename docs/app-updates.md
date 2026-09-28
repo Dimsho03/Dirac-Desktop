@@ -11,9 +11,11 @@ Scope: Windows application binary updates only. Profile / endpoint recovery is i
 - Channels are architecture-specific: win-x64-stable and win-x64-beta.
 - Dimsho.Dirac.Desktop is the initial package id. Stable/beta are channels, not separate installations.
 - The backend accepts ordered update endpoints. It does not contain a GitHub token or any VPN profile data.
-- Public GitHub Releases from Dimsho03/Dirac-Desktop can be used as a client update source without embedding a GitHub access token.
+- The first client endpoint is now hardcoded to unauthenticated `https://github.com/Dimsho03/Dirac-Desktop` GitHub Releases; the active app update channel is `win-x64-stable` by default, with `win-x64-beta` by explicit user opt-in.
+- The app-update beta choice is persisted independently of v2rayN core prerelease updates; no profile subscription or replacement is implied.
+- A public `Dimsho03/Dirac-Desktop` GitHub Releases feed can be read without embedding a GitHub access token. The source repository is currently **private**: public clients cannot update yet. Keep the repository private until its source/credential audit and explicit publication decision are complete; alternatively change the client to a separate public release repository in a reviewed source commit.
 - A static HTTPS mirror can be added as another endpoint later.
-- Publishing is deliberately not automatic yet.
+- Publishing is deliberately not automatic: `scripts/Publish-DiracGitHubRelease.ps1` validates local Velopack manifests, SHA-256 and private-payload exclusion by default without writing GitHub data. It only creates a **draft** when explicitly called with `-PublishDraft`, after the repo is public and the installer has a valid Authenticode signature.
 - Release packaging is fail-closed: the pack script requires the pinned custom Xray and signed Wintun hashes before Velopack can produce an installer/update feed.
 - GitHub Actions publishing is intentionally deferred until the pinned custom-core dependency has a reproducible CI source; a workflow that silently omitted the custom core would produce a broken Dirac release.
 
@@ -28,12 +30,51 @@ Scope: Windows application binary updates only. Profile / endpoint recovery is i
 
 ## Before first public release
 
-- Wire the public Dimsho03/Dirac-Desktop GitHub Releases feed as the primary application-update origin; an independent static HTTPS mirror may be added later.
-- Add UI for check/download/apply plus release notes and progress.
-- Perform installed 0.1.0 -> 0.1.1 update and rollback/recovery tests.
+- GitHub Releases is now the first app-update origin in the desktop code. Make source releases publicly accessible before shipping to friends; do not embed a PAT. An independent mirror is deliberately deferred.
+- The legacy Avalonia Help menu now offers tokenless GitHub check/download/apply with quarter-step progress and Stable/Beta choice. The redesigned UI still needs to add release notes, an explicit progress panel and a cancellation path.
+- HOME successfully completed a separate installed 0.1.2 -> 0.1.3 offline Velopack delta update with restart, pinned runtime hashes and data persistence. A real *public GitHub-origin* installed update and rollback/recovery remain to be tested after the first public release.
 - Confirm user data survives an update.
 - Add Authenticode signing before broad distribution.
 - Keep custom Xray pinned and excluded from upstream v2rayN core replacement.
 - Installed Dirac data root: %LocalAppData%\Dirac; it is outside the Velopack current directory.
 - The upstream v2rayN application updater is blocked in Dirac Desktop, including background app-update checks.
 - The packer preserves prior releases in the feed directory so later versions can produce a continuous feed and delta packages.
+
+
+## First public release procedure
+
+The pinned packer produces channel-specific feed files, including
+`assets.win-x64-stable.json`, `releases.win-x64-stable.json`,
+`RELEASES-win-x64-stable`, the full package, optional delta, portable ZIP
+and installer. Beta uses the corresponding `win-x64-beta` filenames.
+
+First, package a release with `scripts/Pack-Dirac-AppUpdate.ps1` using
+the original SHA-256-pinned Dirac Xray/Wintun runtime, pinned GeoData and
+Velopack 1.2.158. Never put a user's profile, UUID, encryption keys or
+`guiConfigs` in the release build directory.
+
+Validate the release package **without uploading anything**:
+
+```powershell
+.\scripts\Publish-DiracGitHubRelease.ps1 -Version 0.1.4 -Channel stable -FeedDir C:\path\to\validated-feed
+```
+
+After the repo is publicly accessible, the installer is Authenticode-signed,
+the source commit matches the package, and the release notes have been
+reviewed, upload a *draft*:
+
+```powershell
+.\scripts\Publish-DiracGitHubRelease.ps1 -Version 0.1.4 -Channel stable -FeedDir C:\path\to\validated-feed -NotesFile C:\path\to\notes.md -PublishDraft
+```
+
+Review the draft's feed JSON, installer, package hashes, notices, GPL source
+tag and release notes on GitHub. Publishing the reviewed draft is a distinct
+manual step. For beta, use `-Channel beta` and a matching prerelease version.
+The publisher uses the operator's existing GitHub CLI session; **no GitHub
+token is shipped with or embedded in Dirac**.
+
+When TUN is connected, the current legacy UI allows downloading updates but
+does not attempt an untested connected-TUN installation. It asks the user to
+disconnect first; a later check can use the already downloaded update. The
+core still stops through `AppExitAsync` when applying an approved update.
+This conservative restriction can be lifted after active-TUN update QA.
