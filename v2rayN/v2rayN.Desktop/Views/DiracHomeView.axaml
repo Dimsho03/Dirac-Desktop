@@ -92,9 +92,9 @@
                     </Border>
                     <StackPanel VerticalAlignment="Center" Spacing="1">
                         <TextBlock Text="DIRAC" FontSize="23" FontWeight="Bold" Foreground="#F5FAFF"
-                                   CharacterSpacing="1.3"/>
+                                  />
                         <TextBlock Text="DESKTOP  ·  PREVIEW" Foreground="#7695A5" FontSize="9"
-                                   CharacterSpacing="1.1"/>
+                                  />
                     </StackPanel>
                 </StackPanel>
 
@@ -105,7 +105,7 @@
                 <Border Grid.Row="6" Padding="14" CornerRadius="14" Background="#172B39">
                     <StackPanel Spacing="7">
                         <TextBlock Text="DIRAC CORE" Foreground="#82AAAE" FontSize="10" FontWeight="Bold"
-                                   CharacterSpacing="0.9"/>
+                                  />
                         <TextBlock Text="Xray · Native TUN" Foreground="#D7E4EC" FontSize="12"/>
                         <TextBlock Text="Тестовая версия интерфейса"
                                    Foreground="#87A3B3" FontSize="11" TextWrapping="Wrap"/>
@@ -137,7 +137,7 @@
                             BorderThickness="1" CornerRadius="24" Padding="25,23">
                         <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
                             <TextBlock Grid.Row="0" Text="VPN-СОЕДИНЕНИЕ" FontSize="11" FontWeight="Bold"
-                                       CharacterSpacing="1.4" Foreground="#7FABB5"/>
+                                       Foreground="#7FABB5"/>
                             <Button x:Name="btnDiracConnect" Grid.Row="1"
                                     Width="164" Height="164" CornerRadius="90" Background="#20483F"
                                     BorderThickness="2" BorderBrush="#62DAB2" Foreground="#AEFFDD"
@@ -167,7 +167,7 @@
                             BorderThickness="1" CornerRadius="24" Padding="21,22">
                         <StackPanel Spacing="13">
                             <TextBlock Text="МАРШРУТИЗАЦИЯ" FontSize="11" FontWeight="Bold"
-                                       CharacterSpacing="1.4" Foreground="#7FABB5"/>
+                                       Foreground="#7FABB5"/>
                             <TextBlock Text="Выберите режим" FontSize="19" FontWeight="Bold"
                                        Foreground="#F0F8FC" Margin="0,2,0,2"/>
                             <Button x:Name="btnDiracRussia" Classes="diracOption selected">
@@ -241,7 +241,7 @@
                 </Border>
                 <TextBlock Text="DIRAC DESKTOP  ·  ПРЕДВАРИТЕЛЬНЫЙ ИНТЕРФЕЙС  ·  WINDOWS IPv4 TUN"
                            HorizontalAlignment="Center" Foreground="#537284"
-                           FontSize="10" CharacterSpacing="0.8"/>
+                           FontSize="10"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
