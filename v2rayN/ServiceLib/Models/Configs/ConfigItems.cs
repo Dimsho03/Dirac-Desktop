@@ -141,6 +141,9 @@ public class CoreTypeItem
 public class TunModeItem
 {
     public bool EnableTun { get; set; }
+    // Applies only to eligible Dirac native IPv4 TUN. Defaults to Russia-direct
+    // for new installs and for older configuration files missing this property.
+    public bool DiracRussiaDirect { get; set; } = true;
     public bool AutoRoute { get; set; } = true;
     public bool StrictRoute { get; set; } = true;
     public string Stack { get; set; }
