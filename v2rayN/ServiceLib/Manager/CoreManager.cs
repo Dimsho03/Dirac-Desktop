@@ -16,6 +16,9 @@ public class CoreManager
 
     /// <summary>True only while the currently managed main core is running.</summary>
     public bool IsMainCoreRunning => _processService is not null && !_processService.HasExited;
+
+    /// <summary>Actual active Dirac TUN routing, or null when that mode is not running.</summary>
+    public bool? ActiveDiracRussiaDirect { get; private set; }
     private ProcessService? _processPreService;
     private bool _linuxSudo = false;
     private Func<bool, string, Task>? _updateFunc;
@@ -102,6 +105,7 @@ public class CoreManager
         }
 
         var diracDnsGuardApplied = false;
+        bool? requestedDiracRoute = diracTunEligible ? _config.TunModeItem.DiracRussiaDirect : null;
         if (diracTunEligible)
         {
             try
@@ -114,7 +118,7 @@ public class CoreManager
                 // Select the user's stored TUN policy on generated config only.
                 // Both modes retain direct-DoH bootstrap and Windows DNS guard;
                 // RU-direct additionally validates release-pinned geodata.
-                var russiaDirect = _config.TunModeItem.DiracRussiaDirect;
+                var russiaDirect = requestedDiracRoute!.Value;
                 await DiracRouteMode.ApplyFileAsync(fileName, Utils.GetBinPath(""), russiaDirect);
                 await UpdateFunc(false, russiaDirect
                     ? "Dirac Russia-direct TUN routing verified."
@@ -152,6 +156,7 @@ public class CoreManager
             try
             {
                 await DiracWindowsDnsGuard.ReassertAsync();
+                ActiveDiracRussiaDirect = requestedDiracRoute;
                 await UpdateFunc(false, "Dirac TUN and DNS guard are active.");
             }
             catch (Exception ex)
@@ -244,6 +249,7 @@ public class CoreManager
         }
         finally
         {
+            ActiveDiracRussiaDirect = null;
             if (Utils.IsWindows())
             {
                 try
