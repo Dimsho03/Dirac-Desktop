@@ -247,6 +247,10 @@ public class WebDavItem
 public class CheckUpdateItem
 {
     public bool CheckPreReleaseUpdate { get; set; }
+
+    // Dirac application updates are independent of v2rayN core updates.
+    // Stable is the default for both new installs and older configuration files.
+    public bool DiracBetaChannel { get; set; } = false;
     public List<string>? SelectedCoreTypes { get; set; }
 }
 
