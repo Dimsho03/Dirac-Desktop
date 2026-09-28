@@ -34,6 +34,22 @@ internal sealed record DiracUpdateCheckResult(
 
 internal sealed class DiracAppUpdateService
 {
+    /// <summary>
+    /// The first distributed MVP uses only public GitHub Releases. Never
+    /// embed a GitHub token or substitute an owner-provided VPN profile URL.
+    /// </summary>
+    public Task<DiracUpdateCheckResult> CheckGitHubAsync(bool betaChannel)
+    {
+        var endpoint = new DiracUpdateEndpoint(
+            "Dirac GitHub Releases",
+            DiracUpdateSourceKind.GitHub,
+            DiracGitHubReleaseConfig.RepositoryUrl,
+            DiracGitHubReleaseConfig.IncludePrereleases(betaChannel));
+        return CheckAsync(
+            [endpoint],
+            explicitChannel: DiracGitHubReleaseConfig.Channel(betaChannel));
+    }
+
     public async Task<DiracUpdateCheckResult> CheckAsync(
         IReadOnlyList<DiracUpdateEndpoint> endpoints,
         string? explicitChannel = null)
@@ -68,7 +84,9 @@ internal sealed class DiracAppUpdateService
             }
             catch (Exception ex)
             {
-                errors.Add($"{endpoint.Name}: {ex.GetType().Name}: {ex.Message}");
+                // UI surfaces only the endpoint and exception type. Library
+                // error messages can contain URLs, tokens or proxy credentials.
+                errors.Add($"{endpoint.Name}: {ex.GetType().Name}");
             }
         }
 
