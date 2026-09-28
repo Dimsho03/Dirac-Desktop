@@ -6,6 +6,38 @@ SOCKS/HTTP clients keep their original behavior. Only ephemeral generated
 Xray JSON is changed, after direct-DoH bootstrap and before Windows DNS/TUN
 settings are modified.
 
+## Selecting the TUN mode
+
+For an eligible, pinned Dirac native IPv4 TUN profile, **Russia-direct is on by
+default**, including when upgrading an older app configuration that does not
+yet contain the routing preference. The legacy desktop menu exposes **Dirac
+TUN routing → Russia directly (default) / Full VPN (all TUN traffic)**. The
+preference is stored in the user's persistent configuration; switching it
+does not rewrite the original private connection profile.
+
+When this managed TUN is already connected, a mode change uses the existing
+serialized CoreManager reload. On every start, both modes run the direct-DoH
+edge bootstrap and keep the Windows localhost DNS guard. Russia-direct
+validates SHA-256-pinned GeoData before changing Windows DNS/TUN. Full VPN
+instead places unconditional DNS-inbound and TUN-inbound VLESS rules ahead of
+all existing rules, without adding a physical direct outbound. Existing
+independent SOCKS/HTTP inbound rules are left in place. If the native TUN is
+off, changing the preference only saves it for the next connection.
+
+This switch only applies to an eligible Dirac custom profile using the pinned
+Xray runtime; it does not silently apply to generic v2rayN subscriptions or
+other cores. The redesigned Dirac UI will expose the same persisted setting.
+
+The managed ServiceLib mode sequence Russia-direct → Full VPN →
+Russia-direct was also exercised against an isolated real HOME Windows IPv4
+TUN: a real Ozon TLS connection had an Xray-owned physical socket in both
+Russia-direct runs and **no physical Ozon socket** in Full VPN, while foreign
+HTTPS used the VPS in all three runs. The manager logged completion and a
+graceful CoreStop, and a separate passive audit confirmed Xray/TUN stopped,
+physical DNS and default route restored, and ordinary direct HTTPS working.
+The test supervisor's final process-exit assertion returned an error despite
+those independent checks; do not treat this as a crash/reboot recovery test.
+
 ## Routing priority
 
 1. Localhost Dirac DNS relay via encrypted VLESS.
@@ -78,7 +110,7 @@ The preset assumes the physical connection is actually in Russia. Direct
 traffic outside Russia will not acquire a Russian IP merely because it is
 categorized as domestic.
 
-Before shipping, verify real Russian ISP egress for Ozon, Wildberries,
+Before broad distribution, verify real Russian ISP egress for Wildberries,
 Gosuslugi, banks, Telegram, YouTube and blocked .ru domains. Also test UDP,
 QUIC, opaque-IP apps, DNS leakage, switching Wi-Fi/Ethernet, crash recovery
 and real global IPv6. An offline Xray run -test proves configuration validity,
