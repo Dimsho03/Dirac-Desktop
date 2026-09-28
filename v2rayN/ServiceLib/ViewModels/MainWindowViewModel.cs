@@ -356,7 +356,13 @@ public partial class MainWindowViewModel : MyReactiveObject
         }
         await RefreshServersDispatcherAsync();
 
-        await Reload();
+        // First-run Dirac has no owner-provided private profile. Starting
+        // a VPN core against an empty configuration only shows a misleading
+        // error; the dashboard stays disconnected until the first import.
+        if (await ConfigHandler.GetDefaultServer(_config) is not null)
+        {
+            await Reload();
+        }
     }
 
     #endregion Init
@@ -498,7 +504,12 @@ public partial class MainWindowViewModel : MyReactiveObject
 
         try
         {
-            await DiracProfileImport.ImportFileAsync(_config, file);
+            var hadDefault = await ConfigHandler.GetDefaultServer(_config) is not null;
+            var imported = await DiracProfileImport.ImportFileAsync(_config, file);
+            if (!hadDefault)
+            {
+                await ConfigHandler.SetDefaultServerIndex(_config, imported.IndexId);
+            }
             await RefreshSubscriptions();
             await RefreshServersDispatcherAsync();
             NoticeManager.Instance.Enqueue("Dirac profile imported. RU-direct is available in TUN mode.");
@@ -522,7 +533,12 @@ public partial class MainWindowViewModel : MyReactiveObject
         var text = await ReadTextFromClipboardInteraction.HandleSafe(RxVoid.Default);
         try
         {
-            await DiracProfileImport.ImportClipboardAsync(_config, text);
+            var hadDefault = await ConfigHandler.GetDefaultServer(_config) is not null;
+            var imported = await DiracProfileImport.ImportClipboardAsync(_config, text);
+            if (!hadDefault)
+            {
+                await ConfigHandler.SetDefaultServerIndex(_config, imported.IndexId);
+            }
             await RefreshSubscriptions();
             await RefreshServersDispatcherAsync();
             NoticeManager.Instance.Enqueue("Dirac profile imported. RU-direct is available in TUN mode.");
