@@ -50,6 +50,8 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             this.BindCommand(ViewModel, vm => vm.AddCustomOutboundServerCmd, v => v.menuAddCustomOutboundServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddPolicyGroupServerCmd, v => v.menuAddPolicyGroupServer).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddProxyChainServerCmd, v => v.menuAddProxyChainServer).DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.ImportDiracProfileFileCmd, v => v.menuImportDiracProfileFile).DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.ImportDiracProfileClipboardCmd, v => v.menuImportDiracProfileClipboard).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddServerViaClipboardCmd, v => v.menuAddServerViaClipboard).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddServerViaScanCmd, v => v.menuAddServerViaScan).DisposeWith(disposables);
             this.BindCommand(ViewModel, vm => vm.AddServerViaImageCmd, v => v.menuAddServerViaImage).DisposeWith(disposables);
@@ -91,6 +93,12 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             {
                 var result = await AvaUtils.GetClipboardData(this);
                 interaction.SetOutput(result);
+            }).DisposeWith(disposables);
+
+            ViewModel.BrowseDiracProfileFileInteraction.RegisterHandler(async interaction =>
+            {
+                var file = await UI.OpenFileDialog(null);
+                interaction.SetOutput(file);
             }).DisposeWith(disposables);
 
             ViewModel.ScanScreenInteraction.RegisterHandler(async interaction =>
