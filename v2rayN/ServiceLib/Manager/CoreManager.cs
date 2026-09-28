@@ -13,6 +13,9 @@ public class CoreManager
     private WindowsJobService? _processJob;
 
     private ProcessService? _processService;
+
+    /// <summary>True only while the currently managed main core is running.</summary>
+    public bool IsMainCoreRunning => _processService is not null && !_processService.HasExited;
     private ProcessService? _processPreService;
     private bool _linuxSudo = false;
     private Func<bool, string, Task>? _updateFunc;
