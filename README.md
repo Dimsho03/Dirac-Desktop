@@ -85,6 +85,9 @@ This repository includes substantial code originating from [v2rayN](https://gith
 - [Velopack](https://github.com/velopack/velopack) — application packaging and update framework.
 ## Russia-direct routing
 
-Dirac includes a pinned, SHA-256-checked Russia-direct TUN preset. Important
-Russian services and banks use the physical network, while blocked sites and
-other traffic use the VPN. See [routing policy and GeoData provenance](docs/ru-routing.md).
+Dirac enables a pinned, SHA-256-checked **Russia-direct** policy by default
+for eligible native IPv4 TUN profiles. Russian services and banks use the
+physical network, while other traffic uses the VPN. Users can select **Full
+VPN** instead; the selected TUN mode persists between application restarts.
+Both modes keep the protected local DNS relay. See
+[routing modes, validation, and GeoData provenance](docs/ru-routing.md).
