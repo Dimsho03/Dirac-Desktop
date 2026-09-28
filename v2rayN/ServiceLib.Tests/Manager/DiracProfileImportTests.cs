@@ -69,6 +69,19 @@ public class DiracProfileImportTests
     }
 
     [Test]
+    public async Task RejectsMalformedUtf8InsideAnOtherwiseValidProfile()
+    {
+        var raw = Encoding.UTF8.GetBytes(Example);
+        var marker = Encoding.UTF8.GetBytes("synthetic-test-ech");
+        var offset = raw.AsSpan().IndexOf(marker);
+        await (offset >= 0).Should().BeTrue();
+        raw[offset] = 0xC3;  // Invalid leading UTF-8 byte, followed by ASCII.
+        raw[offset + 1] = (byte)'(';
+
+        await DiracProfileImport.IsCompatible(raw).Should().BeFalse();
+    }
+
+    [Test]
     public async Task RejectsMalformedAndIncompleteProfiles()
     {
         foreach (var invalid in new[]
