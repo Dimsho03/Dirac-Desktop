@@ -51,7 +51,18 @@ public partial class DiracHomeView : UserControl
                 btnDiracConnect.Content = "⏻";
                 btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#A0FFD8");
                 btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#275B4B");
-                btnDiracConnect.ToolTip = "Отключить VPN";
+                ToolTip.SetTip(btnDiracConnect, "Отключить VPN");
+                break;
+
+            case DiracConnectionDisplay.Disconnecting:
+                txtDiracHeaderStatus.Text = "◌  Отключение";
+                txtDiracConnection.Text = "Отключение…";
+                txtDiracConnectionHint.Text = "Останавливаем TUN и восстанавливаем обычную сеть";
+                txtDiracDns.Text = "Возврат обычного DNS…";
+                btnDiracConnect.Content = "⏻";
+                btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#E1B870");
+                btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#50422E");
+                ToolTip.SetTip(btnDiracConnect, "Завершение работы VPN");
                 break;
 
             case DiracConnectionDisplay.Connecting:
@@ -62,7 +73,7 @@ public partial class DiracHomeView : UserControl
                 btnDiracConnect.Content = "⏻";
                 btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#E1B870");
                 btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#50422E");
-                btnDiracConnect.ToolTip = "Отменить подключение";
+                ToolTip.SetTip(btnDiracConnect, "Отменить подключение");
                 break;
 
             case DiracConnectionDisplay.Unavailable:
@@ -73,7 +84,7 @@ public partial class DiracHomeView : UserControl
                 btnDiracConnect.Content = "⏻";
                 btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#DDA27F");
                 btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#4A342D");
-                btnDiracConnect.ToolTip = "Отключить попытку VPN";
+                ToolTip.SetTip(btnDiracConnect, "Отключить попытку VPN");
                 break;
 
             default:
@@ -84,7 +95,7 @@ public partial class DiracHomeView : UserControl
                 btnDiracConnect.Content = "⏻";
                 btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#62DAB2");
                 btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#20483F");
-                btnDiracConnect.ToolTip = "Подключить VPN";
+                ToolTip.SetTip(btnDiracConnect, "Подключить VPN");
                 break;
         }
     }
@@ -127,5 +138,6 @@ public enum DiracConnectionDisplay
     Disconnected,
     Connecting,
     Connected,
+    Disconnecting,
     Unavailable
 }
