@@ -3,6 +3,7 @@ namespace ServiceLib.ViewModels;
 public partial class MainWindowViewModel : MyReactiveObject
 {
     public Interaction<RxVoid, string?> ReadTextFromClipboardInteraction { get; } = new();
+    public Interaction<RxVoid, string?> BrowseDiracProfileFileInteraction { get; } = new();
     public Interaction<RxVoid, byte[]?> ScanScreenInteraction { get; } = new();
     public Interaction<RxVoid, string?> BrowseImageFileInteraction { get; } = new();
     public Interaction<bool?, RxVoid> ShowHideWindowInteraction { get; } = new();
@@ -36,6 +37,8 @@ public partial class MainWindowViewModel : MyReactiveObject
     public ReactiveCommand<RxVoid, RxVoid> AddCustomOutboundServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddPolicyGroupServerCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddProxyChainServerCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> ImportDiracProfileFileCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> ImportDiracProfileClipboardCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddServerViaClipboardCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddServerViaScanCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> AddServerViaImageCmd { get; }
@@ -156,6 +159,8 @@ public partial class MainWindowViewModel : MyReactiveObject
         {
             await AddServerAsync(EConfigType.ProxyChain);
         });
+        ImportDiracProfileFileCmd = ReactiveCommand.CreateFromTask(ImportDiracProfileFileAsync);
+        ImportDiracProfileClipboardCmd = ReactiveCommand.CreateFromTask(ImportDiracProfileClipboardAsync);
         AddServerViaClipboardCmd = ReactiveCommand.CreateFromTask(async () =>
         {
             await AddServerViaClipboardAsync(null);
@@ -468,6 +473,59 @@ public partial class MainWindowViewModel : MyReactiveObject
             {
                 await Reload();
             }
+        }
+    }
+
+    public async Task ImportDiracProfileFileAsync()
+    {
+        var file = await BrowseDiracProfileFileInteraction.HandleSafe(RxVoid.Default);
+        if (string.IsNullOrWhiteSpace(file))
+        {
+            return;
+        }
+
+        try
+        {
+            await DiracProfileImport.ImportFileAsync(_config, file);
+            await RefreshSubscriptions();
+            await RefreshServersDispatcherAsync();
+            NoticeManager.Instance.Enqueue("Dirac profile imported. RU-direct is available in TUN mode.");
+        }
+        catch (InvalidDataException)
+        {
+            NoticeManager.Instance.Enqueue(DiracProfileImport.UnsupportedProfileMessage);
+        }
+        catch (IOException)
+        {
+            NoticeManager.Instance.Enqueue("Could not save the Dirac profile.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NoticeManager.Instance.Enqueue("Could not read or save the Dirac profile.");
+        }
+    }
+
+    public async Task ImportDiracProfileClipboardAsync()
+    {
+        var text = await ReadTextFromClipboardInteraction.HandleSafe(RxVoid.Default);
+        try
+        {
+            await DiracProfileImport.ImportClipboardAsync(_config, text);
+            await RefreshSubscriptions();
+            await RefreshServersDispatcherAsync();
+            NoticeManager.Instance.Enqueue("Dirac profile imported. RU-direct is available in TUN mode.");
+        }
+        catch (InvalidDataException)
+        {
+            NoticeManager.Instance.Enqueue(DiracProfileImport.UnsupportedProfileMessage);
+        }
+        catch (IOException)
+        {
+            NoticeManager.Instance.Enqueue("Could not save the Dirac profile.");
+        }
+        catch (UnauthorizedAccessException)
+        {
+            NoticeManager.Instance.Enqueue("Could not read or save the Dirac profile.");
         }
     }
 
