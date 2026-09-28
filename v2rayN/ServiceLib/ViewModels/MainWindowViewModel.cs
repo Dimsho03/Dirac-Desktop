@@ -69,6 +69,8 @@ public partial class MainWindowViewModel : MyReactiveObject
 
     public ReactiveCommand<RxVoid, RxVoid> RegionalPresetIranCmd { get; }
 
+    public ReactiveCommand<RxVoid, RxVoid> SetDiracRussiaDirectCmd { get; }
+    public ReactiveCommand<RxVoid, RxVoid> SetDiracFullVpnCmd { get; }
     public ReactiveCommand<RxVoid, RxVoid> ReloadCmd { get; }
 
     [Reactive]
@@ -81,6 +83,9 @@ public partial class MainWindowViewModel : MyReactiveObject
     public partial int TabMainSelectedIndex { get; set; }
 
     [Reactive] public partial bool BlIsWindows { get; set; }
+
+    [Reactive] public partial bool BlDiracRussiaDirect { get; set; }
+    [Reactive] public partial bool BlDiracFullVpn { get; set; }
 
     [Reactive] public partial bool BlNewUpdate { get; set; }
 
@@ -95,6 +100,8 @@ public partial class MainWindowViewModel : MyReactiveObject
         _config = AppManager.Instance.Config;
         BlIsWindows = Utils.IsWindows();
         MainGirdOrientation = _config.UiItem.MainGirdOrientation;
+        BlDiracRussiaDirect = _config.TunModeItem.DiracRussiaDirect;
+        BlDiracFullVpn = !BlDiracRussiaDirect;
 
         #region WhenAnyValue && ReactiveCommand
 
@@ -234,6 +241,11 @@ public partial class MainWindowViewModel : MyReactiveObject
         {
             await OpenTheFileLocation();
         });
+
+        SetDiracRussiaDirectCmd = ReactiveCommand.CreateFromTask(
+            async () => await SetDiracRouteModeAsync(russiaDirect: true));
+        SetDiracFullVpnCmd = ReactiveCommand.CreateFromTask(
+            async () => await SetDiracRouteModeAsync(russiaDirect: false));
 
         ReloadCmd = ReactiveCommand.CreateFromTask(async () =>
         {
@@ -705,6 +717,74 @@ public partial class MainWindowViewModel : MyReactiveObject
     #endregion Setting
 
     #region core job
+
+    // Do not let two independently bound menu commands race to persist the mode.
+    private readonly SemaphoreSlim _diracRouteSwitchSemaphore = new(1, 1);
+
+    public async Task SetDiracRouteModeAsync(bool russiaDirect)
+    {
+        if (!await _diracRouteSwitchSemaphore.WaitAsync(0))
+        {
+            return;
+        }
+
+        try
+        {
+            if (_config.TunModeItem.DiracRussiaDirect == russiaDirect)
+            {
+                return;
+            }
+
+            var previous = _config.TunModeItem.DiracRussiaDirect;
+            _config.TunModeItem.DiracRussiaDirect = russiaDirect;
+            if (await ConfigHandler.SaveConfig(_config) != 0)
+            {
+                _config.TunModeItem.DiracRussiaDirect = previous;
+                NoticeManager.Instance.Enqueue("Could not save Dirac routing preference.");
+                return;
+            }
+
+            BlDiracRussiaDirect = russiaDirect;
+            BlDiracFullVpn = !russiaDirect;
+
+            // Changing the preference while TUN is off must never connect
+            // the VPN on the user's behalf.
+            if (!_config.TunModeItem.EnableTun || !CoreManager.Instance.IsMainCoreRunning)
+            {
+                NoticeManager.Instance.Enqueue("Dirac routing saved for the next TUN connection.");
+                return;
+            }
+
+            // Reuse the existing serialized reload path: it closes the old
+            // managed core, restores DNS, then bootstraps the new TUN policy.
+            try
+            {
+                await Reload();
+            }
+            catch (Exception)
+            {
+                NoticeManager.Instance.Enqueue(
+                    "Dirac routing saved, but reconnect failed. Disconnect or retry to restore the network.");
+                return;
+            }
+
+            if (CoreManager.Instance.ActiveDiracRussiaDirect == russiaDirect)
+            {
+                NoticeManager.Instance.Enqueue(russiaDirect
+                    ? "Dirac: Russia directly, other traffic through VPN."
+                    : "Dirac: all TUN traffic through VPN.");
+            }
+            else
+            {
+                NoticeManager.Instance.Enqueue(
+                    "Dirac routing saved, but the selected TUN mode is not active. Check connection status.");
+            }
+        }
+        finally
+        {
+            _diracRouteSwitchSemaphore.Release();
+        }
+    }
 
     private bool _hasNextReloadJob = false;
     private readonly SemaphoreSlim _reloadSemaphore = new(1, 1);
