@@ -99,7 +99,13 @@
                     </MenuItem>
 
                     <MenuItem x:Name="menuHelp" Header="{x:Static resx:ResUI.menuHelp}">
-                        <MenuItem x:Name="menuCheckUpdate" Header="{x:Static resx:ResUI.menuCheckUpdate}" />
+                        <MenuItem x:Name="menuDiracCheckUpdate" Header="Check Dirac updates (GitHub Releases)..." />
+                        <MenuItem Header="Dirac app update channel" IsVisible="{Binding BlIsWindows}">
+                            <MenuItem x:Name="menuDiracStableChannel" Header="Stable (default)" ToggleType="Radio" />
+                            <MenuItem x:Name="menuDiracBetaChannel" Header="Beta (opt in)" ToggleType="Radio" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem x:Name="menuCheckUpdate" Header="Core and GeoData updates..." />
                         <Separator />
                     </MenuItem>
 
