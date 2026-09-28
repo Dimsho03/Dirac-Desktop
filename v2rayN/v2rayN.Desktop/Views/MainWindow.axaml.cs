@@ -3,6 +3,7 @@ using DialogHostAvalonia;
 using v2rayN.Desktop.Base;
 using v2rayN.Desktop.Common;
 using v2rayN.Desktop.Manager;
+using v2rayN.Desktop.Services;
 
 namespace v2rayN.Desktop.Views;
 
@@ -14,6 +15,8 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
     private CheckUpdateView? _checkUpdateView;
     private BackupAndRestoreView? _backupAndRestoreView;
     private bool _blCloseByUser = false;
+    private readonly DiracAppUpdateService _diracUpdates = new();
+    private bool _diracUpdateBusy;
 
     public MainWindow()
     {
@@ -26,7 +29,11 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         menuSettingsSetUWP.Click += MenuSettingsSetUWP_Click;
         menuPromotion.Click += MenuPromotion_Click;
         menuCheckUpdate.Click += MenuCheckUpdate_Click;
-        btnNewUpdate.Click += MenuCheckUpdate_Click;
+        menuDiracCheckUpdate.Click += MenuDiracCheckUpdate_Click;
+        menuDiracStableChannel.Click += MenuDiracStableChannel_Click;
+        menuDiracBetaChannel.Click += MenuDiracBetaChannel_Click;
+        btnNewUpdate.Click += MenuDiracCheckUpdate_Click;
+        RefreshDiracUpdateChannelMenu();
         menuBackupAndRestore.Click += MenuBackupAndRestore_Click;
         menuClose.Click += MenuClose_Click;
 
@@ -283,6 +290,146 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         }
 
         ShowHideWindow(true);
+    }
+
+    private void RefreshDiracUpdateChannelMenu()
+    {
+        var beta = _config.CheckUpdateItem.DiracBetaChannel;
+        menuDiracStableChannel.IsChecked = !beta;
+        menuDiracBetaChannel.IsChecked = beta;
+    }
+
+    private async Task SelectDiracUpdateChannelAsync(bool beta)
+    {
+        if (_diracUpdateBusy)
+        {
+            RefreshDiracUpdateChannelMenu();
+            return;
+        }
+
+        var previous = _config.CheckUpdateItem.DiracBetaChannel;
+        _config.CheckUpdateItem.DiracBetaChannel = beta;
+        if (await ConfigHandler.SaveConfig(_config) != 0)
+        {
+            _config.CheckUpdateItem.DiracBetaChannel = previous;
+            NotifyDiracUpdate("Could not save Dirac app update channel.", NotificationType.Error);
+        }
+
+        RefreshDiracUpdateChannelMenu();
+    }
+
+    private async void MenuDiracStableChannel_Click(object? sender, RoutedEventArgs e)
+    {
+        await SelectDiracUpdateChannelAsync(beta: false);
+    }
+
+    private async void MenuDiracBetaChannel_Click(object? sender, RoutedEventArgs e)
+    {
+        await SelectDiracUpdateChannelAsync(beta: true);
+    }
+
+    private void NotifyDiracUpdate(string message, NotificationType type = NotificationType.Information)
+    {
+        _manager?.Show(new Avalonia.Controls.Notifications.Notification("Dirac update", message, type));
+    }
+
+    private async void MenuDiracCheckUpdate_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_diracUpdateBusy)
+        {
+            return;
+        }
+
+        _diracUpdateBusy = true;
+        menuDiracCheckUpdate.IsEnabled = false;
+        menuDiracStableChannel.IsEnabled = false;
+        menuDiracBetaChannel.IsEnabled = false;
+
+        try
+        {
+            var beta = _config.CheckUpdateItem.DiracBetaChannel;
+            var channel = beta ? "beta" : "stable";
+            NotifyDiracUpdate($"Checking public GitHub Releases ({channel})...");
+            var check = await _diracUpdates.CheckGitHubAsync(beta);
+            if (!check.IsInstalled)
+            {
+                NotifyDiracUpdate(
+                    "App updates require an installed Dirac build. Portable/development builds cannot self-update.");
+                return;
+            }
+
+            if (check.Errors.Count > 0)
+            {
+                // A private repository and an unpublished release both
+                // prevent anonymous friends from accessing GitHub Releases.
+                // Do not put raw HTTP errors or tokens into UI notifications.
+                NotifyDiracUpdate(
+                    "GitHub Releases is unavailable for this channel. A public Dirac release may not be published yet.",
+                    NotificationType.Warning);
+                return;
+            }
+
+            if (check.Pending is not { } pending)
+            {
+                NotifyDiracUpdate($"Dirac is current on the {channel} channel.");
+                return;
+            }
+
+            if (await UI.ShowYesNo(
+                $"Dirac {pending.Version} ({channel}) is available on GitHub. Download this app update?") != ButtonResult.Yes)
+            {
+                return;
+            }
+
+            var reported = -1;
+            await DiracAppUpdateService.DownloadAsync(pending, percent =>
+            {
+                var quarter = Math.Clamp(percent, 0, 100) / 25;
+                if (quarter > reported)
+                {
+                    reported = quarter;
+                    Dispatcher.UIThread.Post(() =>
+                        NotifyDiracUpdate($"Downloading Dirac {pending.Version}: {Math.Clamp(percent, 0, 100)}%"));
+                }
+            });
+            NotifyDiracUpdate($"Dirac {pending.Version} has been downloaded and verified by Velopack.");
+
+            if (_config.TunModeItem.EnableTun && CoreManager.Instance.IsMainCoreRunning)
+            {
+                // The connected-TUN application-update sequence still needs
+                // its own end-to-end test. Keep the downloaded package intact
+                // and do not surprise the user by interrupting the VPN.
+                NotifyDiracUpdate(
+                    "Disconnect the active TUN first, then check Dirac updates again to install.",
+                    NotificationType.Warning);
+                return;
+            }
+
+            if (await UI.ShowYesNo(
+                $"Install Dirac {pending.Version} now? The application will close, update and restart.") != ButtonResult.Yes)
+            {
+                return;
+            }
+
+            // Explicitly stop a leftover managed core before starting the
+            // waiting updater; AppExitAsync also restores system DNS/proxy.
+            await CoreManager.Instance.CoreStop();
+            await DiracAppUpdateService.ApplyAndRestartAsync(pending);
+        }
+        catch (Exception ex)
+        {
+            Logging.SaveLog("DiracGitHubReleasesUpdate", ex);
+            NotifyDiracUpdate(
+                $"Dirac application update failed ({ex.GetType().Name}). The existing installation was retained.",
+                NotificationType.Error);
+        }
+        finally
+        {
+            _diracUpdateBusy = false;
+            menuDiracCheckUpdate.IsEnabled = true;
+            menuDiracStableChannel.IsEnabled = true;
+            menuDiracBetaChannel.IsEnabled = true;
+        }
     }
 
     private void MenuCheckUpdate_Click(object? sender, RoutedEventArgs e)
