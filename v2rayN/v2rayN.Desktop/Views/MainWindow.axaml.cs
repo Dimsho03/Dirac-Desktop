@@ -97,7 +97,11 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
 
             ViewModel.BrowseDiracProfileFileInteraction.RegisterHandler(async interaction =>
             {
-                var file = await UI.OpenFileDialog(null);
+                var jsonFilter = new Avalonia.Platform.Storage.FilePickerFileType("Dirac JSON profile")
+                {
+                    Patterns = ["*.json"]
+                };
+                var file = await UI.OpenFileDialog(jsonFilter);
                 interaction.SetOutput(file);
             }).DisposeWith(disposables);
 
