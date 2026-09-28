@@ -41,5 +41,7 @@ For the currently tested HOME IPv4 backend, RU-direct is the default when
 that route is activated. An explicit Full VPN switch belongs to the next UI
 workstream.
 
-The profile import code currently lives on `dirac-desktop/profile-import`
-until validation and merge are complete.
+The dedicated profile importer is included in the main Dirac Desktop codebase.
+Its file and clipboard paths have been verified with an owner-provided full
+TUN profile in an isolated HOME test. Interactive GUI acceptance testing is
+separate from these automated and headless integration checks.
