@@ -24,6 +24,9 @@
                 <ContentControl x:Name="conTheme" DockPanel.Dock="Right" />
                 <Menu Margin="{StaticResource Margin4}">
                     <MenuItem Header="{x:Static resx:ResUI.menuServers}">
+                        <MenuItem x:Name="menuImportDiracProfileFile" Header="Import Dirac profile from file..." />
+                        <MenuItem x:Name="menuImportDiracProfileClipboard" Header="Import Dirac profile from clipboard" InputGesture="Ctrl+Shift+V" />
+                        <Separator />
                         <MenuItem
                             x:Name="menuAddServerViaClipboard"
                             Header="{x:Static resx:ResUI.menuAddServerViaClipboard}"
