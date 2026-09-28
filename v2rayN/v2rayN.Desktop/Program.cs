@@ -17,6 +17,10 @@ internal class Program
     {
         VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
         DiracUpdateRuntime.ConfigurePersistentDataPath();
+        if (DiracInstalledUpdateSmoke.TryHandle(args))
+        {
+            return;
+        }
 
         if (OnStartup(args) == false)
         {
