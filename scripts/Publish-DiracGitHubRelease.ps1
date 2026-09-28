@@ -41,7 +41,7 @@ if(@($versioned | Where-Object Type -eq 'Full').Count -ne 1){
     throw 'The requested release must contain exactly one full package with the expected ID and version.'
 }
 
-$assetList = @(Get-Content -LiteralPath $assetsFile -Raw | ConvertFrom-Json)
+$assetList = Get-Content -LiteralPath $assetsFile -Raw | ConvertFrom-Json
 if($assetList.Count -lt 2){throw 'The Velopack assets manifest is incomplete.'}
 $assetNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
 foreach($asset in $assetList){
