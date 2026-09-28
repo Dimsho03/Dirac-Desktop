@@ -48,6 +48,16 @@ A normal source build compiles the desktop application. Creating a distributable
 
 ServiceLib tests are located in v2rayN/ServiceLib.Tests. The repository CI builds the Windows desktop target and runs the test suite on every relevant push or pull request.
 
+## Private profile import
+
+Dirac profiles are distributed manually by the owner. Dedicated file and
+clipboard imports preserve the original full Xray TUN JSON, including custom
+ECH/encryption extensions. Regular VLESS links still use the standard v2rayN
+importer and do not automatically enable the special Dirac native TUN path.
+
+See [profile import guide](docs/profile-import.md). Automatic profile updates
+and subscriptions are not included in the first release.
+
 ## Application updates
 
 The application-update foundation uses Velopack with separate stable and beta channels. Mutable application data is kept outside Velopack's replaceable application directory.
