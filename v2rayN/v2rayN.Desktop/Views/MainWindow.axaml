@@ -8,10 +8,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:resx="clr-namespace:ServiceLib.Resx;assembly=ServiceLib"
     xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
-    Title="v2rayN"
-    Width="1200"
-    Height="800"
-    MinWidth="600"
+    xmlns:views="clr-namespace:v2rayN.Desktop.Views"
+    Title="Dirac Desktop"
+    Width="1160"
+    Height="820"
+    MinWidth="950"
+    MinHeight="680"
     x:DataType="vms:MainWindowViewModel"
     Design.DataContext="{x:Static dd:DesignData.MainWindow}"
     Icon="/Assets/NotifyIcon1.ico"
@@ -19,8 +21,11 @@
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <dialogHost:DialogHost CloseOnClickAway="True" DisableOpeningAnimation="True">
-        <DockPanel>
+        <Grid>
+            <views:DiracHomeView x:Name="diracHome" />
+            <DockPanel x:Name="legacyWorkspace" IsVisible="False">
             <DockPanel Margin="{StaticResource Margin8}" DockPanel.Dock="Top">
+                <Button x:Name="btnBackDirac" DockPanel.Dock="Left" Content="← Главная Dirac" Margin="6,0,14,0" Padding="16,8" />
                 <ContentControl x:Name="conTheme" DockPanel.Dock="Right" />
                 <Menu Margin="{StaticResource Margin4}">
                     <MenuItem Header="{x:Static resx:ResUI.menuServers}">
@@ -166,6 +171,7 @@
                     </TabControl>
                 </Grid>
             </Grid>
-        </DockPanel>
+            </DockPanel>
+        </Grid>
     </dialogHost:DialogHost>
 </Window>
