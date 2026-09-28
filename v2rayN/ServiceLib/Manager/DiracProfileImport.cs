@@ -34,10 +34,17 @@ public static class DiracProfileImport
 
         try
         {
+            // A malformed UTF-8 sequence must not silently alter private
+            // encryption or ECH fields when imported from a file.
+            _ = new UTF8Encoding(false, true).GetCharCount(raw);
             var root = JsonNode.Parse(raw);
             return DiracDohBootstrap.IsEligible(root);
         }
         catch (JsonException)
+        {
+            return false;
+        }
+        catch (DecoderFallbackException)
         {
             return false;
         }
@@ -87,7 +94,16 @@ public static class DiracProfileImport
             throw new InvalidDataException(UnsupportedProfileMessage);
         }
 
-        var raw = new UTF8Encoding(false, true).GetBytes(clipboardText);
+        byte[] raw;
+        try
+        {
+            raw = new UTF8Encoding(false, true).GetBytes(clipboardText);
+        }
+        catch (EncoderFallbackException)
+        {
+            throw new InvalidDataException(UnsupportedProfileMessage);
+        }
+
         if (!IsCompatible(raw))
         {
             throw new InvalidDataException(UnsupportedProfileMessage);
