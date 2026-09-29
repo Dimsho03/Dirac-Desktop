@@ -66,6 +66,45 @@ public partial class App : Application
                     WindowStartupLocation = WindowStartupLocation.CenterScreen,
                     Content = view
                 };
+                if (state == DiracConnectionDisplay.Connected)
+                {
+                    var previewSeconds = 0;
+                    var previewTimer = new Avalonia.Threading.DispatcherTimer
+                    {
+                        Interval = TimeSpan.FromSeconds(1)
+                    };
+                    previewTimer.Tick += (_, _) =>
+                    {
+                        previewSeconds++;
+                        var phase = previewSeconds % 15;
+                        if (phase == 0)
+                        {
+                            view.SetNetworkHealth(DiracNetworkHealth.Checking);
+                        }
+                        else if (phase == 2)
+                        {
+                            view.SetNetworkHealth(DiracNetworkHealth.Available, 55 + previewSeconds % 45);
+                        }
+                        else if (phase > 2)
+                        {
+                            view.SetNetworkCheckAge(TimeSpan.FromSeconds(phase - 2));
+                        }
+
+                        view.SetTraffic(800_000 + previewSeconds * 211_111L % 900_000,
+                            28_000 + previewSeconds * 17_333L % 85_000);
+                    };
+                    view.NetworkCheckRequested += (_, _) =>
+                    {
+                        view.SetNetworkHealth(DiracNetworkHealth.Checking);
+                        Avalonia.Threading.DispatcherTimer.RunOnce(() =>
+                        {
+                            previewSeconds = 2;
+                            view.SetNetworkHealth(DiracNetworkHealth.Available, 68);
+                        }, TimeSpan.FromMilliseconds(700));
+                    };
+                    previewDesktop.MainWindow.Closed += (_, _) => previewTimer.Stop();
+                    previewTimer.Start();
+                }
                 base.OnFrameworkInitializationCompleted();
                 return;
             }
