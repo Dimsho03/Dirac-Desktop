@@ -95,6 +95,14 @@ public class CoreManager
                                DiracPinnedCore.IsPinned(xrayDirectory) &&
                                await DiracDohBootstrap.IsEligibleFileAsync(fileName);
 
+        // Do not tear down adapters or change DNS while a separate Dirac GUI
+        // still owns an active native TUN. Report the conflict instead.
+        if (diracTunEligible && DiracTunExclusivity.IsForeignTunActive(ActiveDiracRussiaDirect.HasValue))
+        {
+            await UpdateFunc(true, "Another Dirac TUN is active. Disconnect the previous VPN before starting this copy.");
+            return;
+        }
+
         await CoreStop();
         await Task.Delay(100);
 
