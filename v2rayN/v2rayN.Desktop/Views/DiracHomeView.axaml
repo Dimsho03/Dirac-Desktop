@@ -79,16 +79,32 @@
             <Setter Property="Foreground" Value="#F1F4F2"/>
         </Style>
         <Style Selector="Button.diracSmall">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#BBC1C5"/>
-            <Setter Property="BorderBrush" Value="#3B4146"/>
+            <Setter Property="Background" Value="#242A2B"/>
+            <Setter Property="Foreground" Value="#DBE3E1"/>
+            <Setter Property="BorderBrush" Value="#3C4747"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="14,10"/>
         </Style>
         <Style Selector="Button.diracSmall:pointerover">
-            <Setter Property="Background" Value="#272C30"/>
-            <Setter Property="Foreground" Value="#F7F8F8"/>
+            <Setter Property="Background" Value="#303839"/>
+            <Setter Property="BorderBrush" Value="#708A80"/>
+            <Setter Property="Foreground" Value="#F5F8F6"/>
+        </Style>
+        <Style Selector="Button.diracSmall:pressed">
+            <Setter Property="Background" Value="#1E2525"/>
+        </Style>
+        <Style Selector="Button.diracSmall.primary">
+            <Setter Property="Background" Value="#294036"/>
+            <Setter Property="BorderBrush" Value="#648B71"/>
+            <Setter Property="Foreground" Value="#EAF3EC"/>
+        </Style>
+        <Style Selector="Button.diracSmall.primary:pointerover">
+            <Setter Property="Background" Value="#355345"/>
+            <Setter Property="BorderBrush" Value="#91B99C"/>
+        </Style>
+        <Style Selector="Button.diracSmall.primary:pressed">
+            <Setter Property="Background" Value="#22372C"/>
         </Style>
     </UserControl.Styles>
 
@@ -194,16 +210,16 @@
                                    Margin="14,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,9,*">
-                        <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                                <LucideIcon Kind="FileUp" Size="16" StrokeWidth="1.7" Foreground="#C6CCCE"/>
-                                <TextBlock Text="Из файла" FontSize="12"/>
+                        <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall primary" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
+                                <LucideIcon Kind="FileUp" Size="17" StrokeWidth="1.8" Foreground="#B6D6BE"/>
+                                <TextBlock Text="Из файла" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                                <LucideIcon Kind="ClipboardPaste" Size="16" StrokeWidth="1.7" Foreground="#C6CCCE"/>
-                                <TextBlock Text="Из буфера" FontSize="12"/>
+                        <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
+                                <LucideIcon Kind="ClipboardPaste" Size="17" StrokeWidth="1.8" Foreground="#AEC0BF"/>
+                                <TextBlock Text="Из буфера" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </Grid>
