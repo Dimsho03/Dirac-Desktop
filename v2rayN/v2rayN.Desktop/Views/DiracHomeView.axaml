@@ -6,8 +6,7 @@
     x:DataType="vms:MainWindowViewModel"
     Background="#111315">
 
-    <!-- A small native Avalonia shell. Lucide-derived 24x24 line geometries;
-         no icon font, SVG runtime or browser layer is required. -->
+    <!-- Native Lucide.Avalonia icon controls; the custom DIRAC brand mark is intentionally separate. -->
     <UserControl.Styles>
         <Style Selector="Button.diracNav">
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -100,33 +99,25 @@
 
                 <Button Grid.Row="2" x:Name="btnDiracOverview" Classes="diracNav selected">
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <Viewbox Width="19" Height="19">
-                            <Path Data="m3 9 9-7 9 7 v11 a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22v-9h6v9" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7" StrokeLineCap="Round" Fill="Transparent"/>
-                        </Viewbox>
+                        <LucideIcon Kind="House" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Главная" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="3" x:Name="btnDiracRoutingNav" Classes="diracNav" Margin="0,6,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <Viewbox Width="19" Height="19">
-                            <Path Data="M3 17h4a2 2 0 0 0 2-2V7a4 4 0 0 1 4-4h8 M17 7l4-4-4-4 M3 17l4-4 M3 17l4 4" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7" StrokeLineCap="Round" Fill="Transparent"/>
-                        </Viewbox>
+                        <LucideIcon Kind="Route" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Маршрутизация" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="4" x:Name="btnDiracUpdatesNav" Classes="diracNav" Margin="0,6,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <Viewbox Width="19" Height="19">
-                            <Path Data="M20 11a8 8 0 0 0-15-3 M4 4v4h4 M4 13a8 8 0 0 0 15 3 M20 20v-4h-4" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7" StrokeLineCap="Round" Fill="Transparent"/>
-                        </Viewbox>
+                        <LucideIcon Kind="RefreshCcw" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Обновления" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="5" x:Name="btnDiracSettingsNav" Classes="diracNav" Margin="0,6,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="12">
-                        <Viewbox Width="19" Height="19">
-                            <Path Data="M4 21v-7 M4 10V3 M12 21v-9 M12 8V3 M20 21v-5 M20 12V3 M1 14h6 M9 8h6 M17 16h6" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.7" StrokeLineCap="Round" Fill="Transparent"/>
-                        </Viewbox>
+                        <LucideIcon Kind="SlidersHorizontal" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Настройки" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
@@ -146,10 +137,7 @@
                     <TextBlock x:Name="txtDiracConnectionHint" Text="Выберите профиль для подключения" Foreground="#8D9499" FontSize="11" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Margin="0,7,0,18"/>
                     <Border x:Name="diracConnectHalo" Classes="diracHalo" Width="158" Height="158" CornerRadius="79" BorderThickness="1" HorizontalAlignment="Center">
                         <Button x:Name="btnDiracConnect" Classes="diracPower" Width="114" Height="114" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Viewbox Width="32" Height="32">
-                                <!-- Lucide power outline. -->
-                                <Path Data="M18.36 6.64A9 9 0 1 1 5.64 6.64 M12 2v10" Stroke="#F2F3F3" StrokeThickness="1.5" StrokeLineCap="Round" Fill="Transparent"/>
-                            </Viewbox>
+                            <LucideIcon Kind="Power" Size="32" StrokeWidth="1.5" Foreground="#F2F3F3"/>
                         </Button>
                     </Border>
                     <TextBlock x:Name="txtDiracAction" Text="Подключить" Foreground="#A5ABB0" FontSize="11" HorizontalAlignment="Center" Margin="0,10,0,0"/>
@@ -163,13 +151,13 @@
                     <Grid ColumnDefinitions="*,9,*">
                         <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                                <Viewbox Width="14" Height="14"><Path Data="M12 16V2 M7 7l5-5 5 5 M3 16v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4" Stroke="#C6CCCE" StrokeThickness="1.7" StrokeLineCap="Round" Fill="Transparent"/></Viewbox>
+                                <LucideIcon Kind="FileUp" Size="14" StrokeWidth="1.7" Foreground="#C6CCCE"/>
                                 <TextBlock Text="Из файла" FontSize="11"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                                <Viewbox Width="14" Height="14"><Path Data="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2 M9 2h6a1 1 0 0 1 1 1v3H8V3a1 1 0 0 1 1-1z" Stroke="#C6CCCE" StrokeThickness="1.7" StrokeLineCap="Round" Fill="Transparent"/></Viewbox>
+                                <LucideIcon Kind="ClipboardPaste" Size="14" StrokeWidth="1.7" Foreground="#C6CCCE"/>
                                 <TextBlock Text="Из буфера" FontSize="11"/>
                             </StackPanel>
                         </Button>
@@ -177,7 +165,7 @@
                     <Button x:Name="btnDiracRoutingShortcut" Classes="diracNav" Padding="0,8" HorizontalContentAlignment="Stretch">
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock x:Name="txtDiracMode" Text="Россия напрямую" Foreground="#A8AFB3" FontSize="11" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="›" Foreground="#A8AFB3" FontSize="20" VerticalAlignment="Center"/>
+                            <LucideIcon Grid.Column="1" Kind="ChevronRight" Size="17" StrokeWidth="1.6" Foreground="#A8AFB3" VerticalAlignment="Center"/>
                         </Grid>
                     </Button>
                     <TextBlock x:Name="txtDiracProfileCount" Text="Нет профилей" IsVisible="False"/>
