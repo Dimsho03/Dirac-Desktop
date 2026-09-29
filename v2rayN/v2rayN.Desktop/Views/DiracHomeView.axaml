@@ -27,6 +27,7 @@
             <Setter Property="Foreground" Value="#F7F8F9"/>
         </Style>
         <Style Selector="Button.diracRow">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
             <Setter Property="Background" Value="#1B1E20"/>
             <Setter Property="Foreground" Value="#E8EAEB"/>
