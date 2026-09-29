@@ -11,6 +11,7 @@ public partial class MainWindow
     private long? _diracLastSentBytes;
     private DateTime _diracLastTrafficSampleUtc;
     private DateTime _diracNextNetworkProbeUtc;
+    private DateTime? _diracLastNetworkCheckUtc;
     private bool _diracNetworkProbeBusy;
     private CancellationTokenSource? _diracNetworkProbeCancellation;
 
@@ -22,6 +23,7 @@ public partial class MainWindow
             _diracNetworkProbeCancellation = null;
             pendingProbe?.Cancel();
             _diracNextNetworkProbeUtc = DateTime.MinValue;
+            _diracLastNetworkCheckUtc = null;
             _diracLastReceivedBytes = null;
             _diracLastSentBytes = null;
             diracHome.SetTraffic(null, null);
@@ -30,6 +32,10 @@ public partial class MainWindow
         }
 
         SampleDiracTunTraffic();
+        if (_diracLastNetworkCheckUtc.HasValue && !_diracNetworkProbeBusy)
+        {
+            diracHome.SetNetworkCheckAge(DateTime.UtcNow - _diracLastNetworkCheckUtc.Value);
+        }
         if (!_diracNetworkProbeBusy && DateTime.UtcNow >= _diracNextNetworkProbeUtc)
         {
             _ = CheckDiracNetworkAsync(force: false);
@@ -107,6 +113,7 @@ public partial class MainWindow
                 if (!Uri.TryCreate(Global.SpeedPingTestUrls.FirstOrDefault(), UriKind.Absolute, out uri)
                     || uri.Scheme != Uri.UriSchemeHttps)
                 {
+                    _diracLastNetworkCheckUtc = DateTime.UtcNow;
                     diracHome.SetNetworkHealth(DiracNetworkHealth.Unavailable);
                     return;
                 }
@@ -126,6 +133,7 @@ public partial class MainWindow
             if (ReferenceEquals(_diracNetworkProbeCancellation, cancellation)
                 && GetDiracDashboardState() == EDiracDashboardState.Connected)
             {
+                _diracLastNetworkCheckUtc = DateTime.UtcNow;
                 diracHome.SetNetworkHealth(response.IsSuccessStatusCode
                     ? DiracNetworkHealth.Available : DiracNetworkHealth.Unavailable,
                     response.IsSuccessStatusCode ? (int)watch.ElapsedMilliseconds : null);
@@ -136,6 +144,7 @@ public partial class MainWindow
             if (ReferenceEquals(_diracNetworkProbeCancellation, cancellation)
                 && GetDiracDashboardState() == EDiracDashboardState.Connected)
             {
+                _diracLastNetworkCheckUtc = DateTime.UtcNow;
                 diracHome.SetNetworkHealth(DiracNetworkHealth.Unavailable);
             }
         }
