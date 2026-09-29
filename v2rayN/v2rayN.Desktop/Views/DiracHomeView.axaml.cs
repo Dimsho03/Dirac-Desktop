@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Media;
 
 namespace v2rayN.Desktop.Views;
 
@@ -9,6 +10,7 @@ namespace v2rayN.Desktop.Views;
 public partial class DiracHomeView : UserControl
 {
     public event EventHandler? ConnectRequested;
+    public event EventHandler? NetworkCheckRequested;
     public event EventHandler? ProfilesRequested;
     public event EventHandler? DiagnosticsRequested;
     public event EventHandler? AdvancedRequested;
@@ -24,6 +26,7 @@ public partial class DiracHomeView : UserControl
     {
         InitializeComponent();
         btnDiracConnect.Click += (_, _) => ConnectRequested?.Invoke(this, EventArgs.Empty);
+        btnDiracCheckNetwork.Click += (_, _) => NetworkCheckRequested?.Invoke(this, EventArgs.Empty);
         btnDiracOverview.Click += (_, _) => ShowSection("home");
         btnDiracRoutingNav.Click += (_, _) => ShowSection("routing");
         btnDiracRoutingShortcut.Click += (_, _) => ShowSection("routing");
@@ -133,6 +136,49 @@ public partial class DiracHomeView : UserControl
         btnDiracCheckUpdate.IsEnabled = !busy;
     }
 
+    public void SetNetworkHealth(DiracNetworkHealth health, int? latencyMs = null)
+    {
+        txtDiracNetwork.Text = health switch
+        {
+            DiracNetworkHealth.Checking => "Проверка сети…",
+            DiracNetworkHealth.Available => "Сеть доступна",
+            DiracNetworkHealth.Unavailable => "Сеть недоступна",
+            _ => "Не проверяется"
+        };
+        txtDiracLatency.Text = health == DiracNetworkHealth.Available && latencyMs.HasValue
+            ? $"{latencyMs.Value} мс" : "—";
+        diracNetworkDot.Fill = new SolidColorBrush(Color.Parse(health switch
+        {
+            DiracNetworkHealth.Available => "#91B9A0",
+            DiracNetworkHealth.Unavailable => "#C78C8C",
+            DiracNetworkHealth.Checking => "#B6AE91",
+            _ => "#77817C"
+        }));
+        btnDiracCheckNetwork.IsEnabled = health is DiracNetworkHealth.Available or DiracNetworkHealth.Unavailable;
+    }
+
+    public void SetTraffic(long? downloadBytesPerSecond, long? uploadBytesPerSecond)
+    {
+        txtDiracDownload.Text = FormatSpeed(downloadBytesPerSecond);
+        txtDiracUpload.Text = FormatSpeed(uploadBytesPerSecond);
+    }
+
+    private static string FormatSpeed(long? bytesPerSecond)
+    {
+        if (!bytesPerSecond.HasValue)
+        {
+            return "—";
+        }
+        var value = Math.Max(0, bytesPerSecond.Value);
+        if (value < 1024)
+        {
+            return $"{value} Б/с";
+        }
+        return value < 1024 * 1024
+            ? $"{value / 1024d:0.#} КБ/с"
+            : $"{value / (1024d * 1024):0.#} МБ/с";
+    }
+
     public void SetProfileCount(int count)
     {
         txtDiracProfileCount.Text = count switch
@@ -151,5 +197,12 @@ public enum DiracConnectionDisplay
     Connecting,
     Connected,
     Disconnecting,
+    Unavailable
+}
+public enum DiracNetworkHealth
+{
+    Inactive,
+    Checking,
+    Available,
     Unavailable
 }
