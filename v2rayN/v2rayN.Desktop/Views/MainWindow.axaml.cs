@@ -18,6 +18,8 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
     private readonly DiracAppUpdateService _diracUpdates = new();
     private bool _diracUpdateBusy;
     private bool _diracPowerBusy;
+    private double _diracCompactWidth = 550;
+    private double _diracCompactHeight = 610;
     private DateTime? _diracConnectStartedUtc;
     private readonly Avalonia.Threading.DispatcherTimer _diracDashboardTimer = new()
     {
@@ -219,6 +221,10 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         btnBackDirac.Click += (_, _) =>
         {
             legacyWorkspace.IsVisible = false;
+            MinWidth = 500;
+            MinHeight = 545;
+            Width = _diracCompactWidth;
+            Height = _diracCompactHeight;
             diracHome.IsVisible = true;
             RefreshDiracDashboard();
         };
@@ -227,7 +233,18 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
 
     private void ShowDiracAdvancedWorkspace(string section)
     {
+        // The upstream profile editor/log workspace still needs its original
+        // larger canvas, without forcing that size on the minimal dashboard.
+        if (diracHome.IsVisible)
+        {
+            _diracCompactWidth = Width;
+            _diracCompactHeight = Height;
+        }
         diracHome.IsVisible = false;
+        MinWidth = 1050;
+        MinHeight = 680;
+        if (Width < 1120) Width = 1120;
+        if (Height < 760) Height = 760;
         legacyWorkspace.IsVisible = true;
 
         if (section == "logs")
@@ -740,7 +757,9 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
 
     private void StorageUI()
     {
-        ConfigHandler.SaveWindowSizeItem(_config, GetType().Name, Width, Height);
+        ConfigHandler.SaveWindowSizeItem(_config, GetType().Name,
+            diracHome.IsVisible ? Width : _diracCompactWidth,
+            diracHome.IsVisible ? Height : _diracCompactHeight);
 
         if (_config.UiItem.MainGirdOrientation == EGirdOrientation.Horizontal)
         {
