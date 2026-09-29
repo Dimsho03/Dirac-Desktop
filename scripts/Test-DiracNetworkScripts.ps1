@@ -43,6 +43,28 @@ try {
     Assert 'ordinary_dns_leak' (Fixture Ordinary @('127.0.0.1') $false $false $false $false $true $true $true $baseline) Ordinary $false 'ORDINARY_PHYSICAL_DNS_STILL_LOOPBACK:Wi-Fi'
     Assert 'ordinary_stale_tun' (Fixture Ordinary @('192.168.0.1') $false $true $true $false $true $true $true $baseline) Ordinary $false 'ORPHANED_TUN_OR_ROUTE'
     Assert 'ordinary_stale_dns' (Fixture Ordinary @('1.1.1.1') $false $false $false $false $true $true $true $baseline) Ordinary $false 'BASELINE_DNS_NOT_RESTORED:Wi-Fi'
+    # The rollback -WhatIf path must validate the saved snapshot while causing
+    # NO DNS, adapter, or process changes. Dummy executables are never run.
+    $fakeRoot = Join-Path $dir 'dummy-stage'
+    $fakeBin = Join-Path $fakeRoot 'bin\xray'
+    New-Item -ItemType Directory -Path $fakeBin -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $fakeRoot 'v2rayN.exe') -Value 'dummy' -Encoding ASCII
+    Set-Content -LiteralPath (Join-Path $fakeBin 'xray.exe') -Value 'dummy' -Encoding ASCII
+    $fakeBaseline = [pscustomobject]@{
+        Schema = 1
+        Adapters = @([pscustomobject]@{
+            Name='Wi-Fi'; InterfaceId='00000000-0000-0000-0000-000000000001'
+            InterfaceIndex=12;DhcpDns=$true;DnsServers=@('192.168.0.1')
+        })
+    }
+    $fakeBaselineFile = Join-Path $dir 'baseline.json'
+    $fakeBaseline | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath $fakeBaselineFile -Encoding UTF8
+    $fakeResult = Join-Path $dir 'should-not-be-created'
+    $plan = (& $rollback -GuardedRoot $fakeRoot -BaselineFile $fakeBaselineFile -ResultFolder $fakeResult -WhatIf | Out-String)
+    if ($plan -notmatch 'ROLLBACK_DRY_RUN=true' -or (Test-Path $fakeResult)) {
+        $failures.Add('rollback_whatif_must_not_mutate_network_or_create_output')
+        Write-Output 'TEST_rollback_whatif=FAIL'
+    } else { Write-Output 'TEST_rollback_whatif=PASS' }
     if ($failures.Count -gt 0) { throw ($failures -join [Environment]::NewLine) }
-    Write-Output 'DIRAC_OFFLINE_NETWORK_CHECK_TESTS_PASS=8'
+    Write-Output 'DIRAC_OFFLINE_NETWORK_CHECK_TESTS_PASS=9'
 } finally { Remove-Item -LiteralPath $dir -Recurse -Force -ErrorAction SilentlyContinue }
