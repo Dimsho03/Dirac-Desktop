@@ -155,7 +155,9 @@ public class CoreManager
         if (diracDnsGuardApplied && (_processService is null || _processService.HasExited))
         {
             await CoreStop();
-            await UpdateFunc(true, "Dirac TUN core failed to start; DNS settings were restored.");
+            await UpdateFunc(true, DiracWindowsDnsGuard.HasPendingRestore
+                ? "Dirac TUN failed to start and DNS restore is incomplete; use network recovery."
+                : "Dirac TUN core failed to start; original DNS settings were restored.");
             return;
         }
 
