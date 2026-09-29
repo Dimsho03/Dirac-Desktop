@@ -31,6 +31,13 @@ public static class DiracWindowsDnsGuard
 
     private static string StatePath => Utils.GetBinConfigPath(StateFileName);
 
+    /// <summary>
+    /// True when a saved snapshot still needs restoration. A missing physical
+    /// adapter can leave a pending entry without throwing from RestoreAsync.
+    /// Never report "DNS restored" while this durable file remains.
+    /// </summary>
+    public static bool HasPendingRestore => Utils.IsWindows() && File.Exists(StatePath);
+
     public static async Task<bool> ApplyAsync()
     {
         if (!Utils.IsWindows())
