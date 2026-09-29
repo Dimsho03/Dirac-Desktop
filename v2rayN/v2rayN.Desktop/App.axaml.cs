@@ -15,6 +15,63 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        // This isolated visual regression mode never touches AppManager,
+        // saved profiles, Xray, TUN, Windows DNS or the running VPN instance.
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime previewDesktop)
+        {
+            var args = previewDesktop.Args ?? [];
+            if (args.Any(arg => string.Equals(arg, "--dirac-ui-preview", StringComparison.OrdinalIgnoreCase)))
+            {
+                static string Option(string[] values, string name)
+                    => values.FirstOrDefault(value => value.StartsWith(name + "=", StringComparison.OrdinalIgnoreCase))
+                        ?.Substring(name.Length + 1) ?? "";
+
+                static double Dimension(string text, double fallback, double min, double max)
+                    => double.TryParse(text, System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture, out var number)
+                        ? Math.Clamp(number, min, max) : fallback;
+
+                var width = Dimension(Option(args, "--dirac-preview-width"), 550, 500, 1000);
+                var height = Dimension(Option(args, "--dirac-preview-height"), 610, 545, 1000);
+                var page = Option(args, "--dirac-preview-page").ToLowerInvariant();
+                if (page is not ("home" or "routing" or "updates" or "settings"))
+                {
+                    page = "home";
+                }
+
+                var view = new DiracHomeView();
+                view.SetPreviewProfile("[Custom] Dirac");
+                view.SetRouting(russiaDirect: true, canChange: true, isActive: true);
+                view.SetUpdateChannel(beta: false, busy: false);
+                var stateText = Option(args, "--dirac-preview-state");
+                if (!Enum.TryParse<DiracConnectionDisplay>(stateText, ignoreCase: true, out var state))
+                {
+                    state = DiracConnectionDisplay.Connected;
+                }
+                view.SetConnectionState(state);
+                view.ShowSection(page);
+
+                // These callbacks affect only the preview widget's appearance.
+                view.RussiaDirectRequested += (_, _) => view.SetRouting(true, true, true);
+                view.FullVpnRequested += (_, _) => view.SetRouting(false, true, true);
+                view.StableRequested += (_, _) => view.SetUpdateChannel(false, false);
+                view.BetaRequested += (_, _) => view.SetUpdateChannel(true, false);
+
+                previewDesktop.MainWindow = new Window
+                {
+                    Title = "Dirac Desktop UI Preview (offline)",
+                    Width = width,
+                    Height = height,
+                    MinWidth = 500,
+                    MinHeight = 545,
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                    Content = view
+                };
+                base.OnFrameworkInitializationCompleted();
+                return;
+            }
+        }
+
         var viewLocator = SimpleViewLocator.Instance;
         DataTemplates.Add(viewLocator);
 
