@@ -29,7 +29,6 @@ public partial class DiracHomeView : UserControl
         btnDiracCheckNetwork.Click += (_, _) => NetworkCheckRequested?.Invoke(this, EventArgs.Empty);
         btnDiracOverview.Click += (_, _) => ShowSection("home");
         btnDiracRoutingNav.Click += (_, _) => ShowSection("routing");
-        btnDiracRoutingShortcut.Click += (_, _) => ShowSection("routing");
         btnDiracUpdatesNav.Click += (_, _) => ShowSection("updates");
         btnDiracSettingsNav.Click += (_, _) => ShowSection("settings");
         btnDiracProfiles.Click += (_, _) => ProfilesRequested?.Invoke(this, EventArgs.Empty);
@@ -115,10 +114,9 @@ public partial class DiracHomeView : UserControl
         btnDiracFull.Classes.Set("selected", !russiaDirect);
         btnDiracRussia.IsEnabled = canChange;
         btnDiracFull.IsEnabled = canChange;
-        txtDiracMode.Text = russiaDirect ? "Россия напрямую" : "Полный VPN";
         if (isActive)
         {
-            txtDiracConnectionHint.Text = $"Режим: {txtDiracMode.Text}";
+            txtDiracConnectionHint.Text = russiaDirect ? "Режим: Россия напрямую" : "Режим: Полный VPN";
         }
         txtDiracRoutingHint.Text = !canChange
             ? "Дождитесь завершения подключения."
@@ -147,14 +145,26 @@ public partial class DiracHomeView : UserControl
         };
         txtDiracLatency.Text = health == DiracNetworkHealth.Available && latencyMs.HasValue
             ? $"{latencyMs.Value} мс" : "—";
-        diracNetworkDot.Fill = new SolidColorBrush(Color.Parse(health switch
+        var brush = new SolidColorBrush(Color.Parse(health switch
         {
             DiracNetworkHealth.Available => "#91B9A0",
             DiracNetworkHealth.Unavailable => "#C78C8C",
             DiracNetworkHealth.Checking => "#B6AE91",
-            _ => "#77817C"
+            _ => "#9CA6A7"
         }));
+        iconDiracNetwork.Foreground = brush;
+        txtDiracNetwork.Foreground = brush;
+        txtDiracCheckAge.Text = health is DiracNetworkHealth.Available or DiracNetworkHealth.Unavailable
+            ? "сейчас" : "";
         btnDiracCheckNetwork.IsEnabled = health is DiracNetworkHealth.Available or DiracNetworkHealth.Unavailable;
+    }
+
+    public void SetNetworkCheckAge(TimeSpan age)
+    {
+        var seconds = Math.Max(0, (int)age.TotalSeconds);
+        txtDiracCheckAge.Text = seconds < 5 ? "сейчас"
+            : seconds < 60 ? $"{seconds} с назад"
+            : $"{seconds / 60} мин назад";
     }
 
     public void SetTraffic(long? downloadBytesPerSecond, long? uploadBytesPerSecond)
