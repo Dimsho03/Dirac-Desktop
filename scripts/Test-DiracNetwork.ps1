@@ -117,10 +117,10 @@ function CaptureObservation {
         $candidate = @(Get-CimInstance Win32_Process -Filter "Name='xray.exe'" -ErrorAction Stop |
             Where-Object { $_.ExecutablePath -and [string]::Equals($_.ExecutablePath,$fullPath,[StringComparison]::OrdinalIgnoreCase) })
     }
-    $pid = if ($candidate.Count -eq 1) { [int]$candidate[0].ProcessId } else { -1 }
-    $owns53 = $pid -gt 0 -and @(
+    $ownerPid = if ($candidate.Count -eq 1) { [int]$candidate[0].ProcessId } else { -1 }
+    $owns53 = $ownerPid -gt 0 -and @(
         Get-NetUDPEndpoint -LocalPort 53 -ErrorAction SilentlyContinue |
-            Where-Object { $_.OwningProcess -eq $pid }
+            Where-Object { $_.OwningProcess -eq $ownerPid }
     ).Count -gt 0
     $dnsWorks = $false
     try { $dnsWorks = @(Resolve-DnsName example.com -Type A -QuickTimeout -ErrorAction Stop |
