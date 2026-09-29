@@ -62,8 +62,18 @@ Record 'ROLLBACK_BEGIN'
 foreach($entry in @(@{Exe=$gui;Name='v2rayN.exe'},@{Exe=$xray;Name='xray.exe'})){
     foreach($proc in @(ExactProcess $entry.Exe $entry.Name)){
         if($PSCmdlet.ShouldProcess($entry.Exe,'Stop staged PID '+$proc.ProcessId)){
-            Stop-Process -Id $proc.ProcessId -Force -ErrorAction Stop
-            Record ('SCOPED_PROCESS_STOPPED='+$entry.Name+' PID='+$proc.ProcessId)
+            try {
+                Stop-Process -Id $proc.ProcessId -Force -ErrorAction Stop
+                Record ('SCOPED_PROCESS_STOPPED='+$entry.Name+' PID='+$proc.ProcessId)
+            } catch {
+                # A GUI shutdown can reap its Xray child before Stop-Process
+                # executes. Only tolerate a race when this exact PID and
+                # executable are gone; never suppress an access failure.
+                $remaining = @(ExactProcess $entry.Exe $entry.Name |
+                    Where-Object { $_.ProcessId -eq $proc.ProcessId })
+                if ($remaining.Count -gt 0) { throw }
+                Record ('SCOPED_PROCESS_ALREADY_EXITED='+$entry.Name+' PID='+$proc.ProcessId)
+            }
         }
     }
 }
