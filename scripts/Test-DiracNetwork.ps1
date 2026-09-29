@@ -90,13 +90,8 @@ function ProbeHttps([string]$url) {
 function CaptureObservation {
     $defaults = @(Get-NetRoute -AddressFamily IPv4 -DestinationPrefix '0.0.0.0/0' -ErrorAction Stop)
     $all = @(Get-NetAdapter -ErrorAction Stop)
-    $physical = @(
-        $all | Where-Object {
-            $_.Status -eq 'Up' -and $_.Name -notmatch '(?i)(tun|dirac|xray)' -and
-            @($defaults | Where-Object { $_.InterfaceIndex -eq $PSItem.ifIndex }).Count -gt 0
-        }
-    )
-    # Avoid nesting $PSItem inside a second pipeline (it would shadow the adapter).
+    # Capture the adapter before filtering its default routes: nested $_ would
+    # otherwise refer to the route instead of the network adapter.
     $physical = @($all | Where-Object { $_.Status -eq 'Up' -and $_.Name -notmatch '(?i)(tun|dirac|xray)' } |
         ForEach-Object {
             $adapter = $_
