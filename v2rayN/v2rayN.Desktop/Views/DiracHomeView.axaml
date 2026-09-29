@@ -181,7 +181,10 @@
                     </StackPanel>
                 </Border>
                 <StackPanel Grid.Row="3" Spacing="10">
-                    <TextBlock Text="ПРОФИЛЬ" Foreground="#929B9F" FontSize="10" FontWeight="SemiBold"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="ПРОФИЛЬ" Foreground="#929B9F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="txtDiracProfileCount" Grid.Column="1" Text="Нет профилей" Foreground="#929B9F" FontSize="10"/>
+                    </Grid>
                     <ComboBox x:Name="cmbDiracProfile" MinHeight="43" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Stretch" Background="#222527" Foreground="#F0F2F2" BorderBrush="#42484B" BorderThickness="1" CornerRadius="8"
                               ItemsSource="{Binding StatusBarViewModel.Servers}"
                               SelectedItem="{Binding StatusBarViewModel.SelectedServer, Mode=TwoWay}"
@@ -200,7 +203,6 @@
                             </StackPanel>
                         </Button>
                     </Grid>
-                    <TextBlock x:Name="txtDiracProfileCount" Text="Нет профилей" IsVisible="False"/>
                 </StackPanel>
             </Grid>
 
