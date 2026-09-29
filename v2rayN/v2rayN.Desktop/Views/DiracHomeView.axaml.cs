@@ -196,6 +196,7 @@ public partial class DiracHomeView : UserControl
     public void SetProfileCount(int count)
     {
         _profileCount = count;
+        txtDiracProfileEmpty.IsVisible = count == 0;
         txtDiracProfileCount.Text = count switch
         {
             0 => "Нет профилей",
