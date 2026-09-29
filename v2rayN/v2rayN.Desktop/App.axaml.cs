@@ -49,6 +49,11 @@ public partial class App : Application
                 view.SetConnectionState(state);
                 view.SetRouting(russiaDirect: true, canChange: true,
                     isActive: state == DiracConnectionDisplay.Connected);
+                view.SetNetworkHealth(state == DiracConnectionDisplay.Connected
+                    ? DiracNetworkHealth.Available : DiracNetworkHealth.Inactive,
+                    state == DiracConnectionDisplay.Connected ? 68 : null);
+                view.SetTraffic(state == DiracConnectionDisplay.Connected ? 1327104 : null,
+                    state == DiracConnectionDisplay.Connected ? 65536 : null);
                 view.ShowSection(page);
 
                 previewDesktop.MainWindow = new Window
