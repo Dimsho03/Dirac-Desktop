@@ -164,15 +164,15 @@
                         </Grid>
                         <Grid ColumnDefinitions="*,*,*">
                             <StackPanel Grid.Column="0" Spacing="3">
-                                <TextBlock Text="ЗАДЕРЖКА" Foreground="#798489" FontSize="9"/>
+                                <TextBlock Text="ЗАДЕРЖКА" Foreground="#798489" FontSize="9" ToolTip.Tip="Время ответа HTTPS через текущую сеть"/>
                                 <TextBlock x:Name="txtDiracLatency" Text="—" Foreground="#E8ECEB" FontSize="12"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="3">
-                                <TextBlock Text="ЗАГРУЗКА" Foreground="#798489" FontSize="9"/>
+                                <TextBlock Text="ЗАГРУЗКА" Foreground="#798489" FontSize="9" ToolTip.Tip="Входящий трафик TUN за секунду"/>
                                 <TextBlock x:Name="txtDiracDownload" Text="—" Foreground="#E8ECEB" FontSize="12"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" Spacing="3">
-                                <TextBlock Text="ВЫГРУЗКА" Foreground="#798489" FontSize="9"/>
+                                <TextBlock Text="ВЫГРУЗКА" Foreground="#798489" FontSize="9" ToolTip.Tip="Исходящий трафик TUN за секунду"/>
                                 <TextBlock x:Name="txtDiracUpload" Text="—" Foreground="#E8ECEB" FontSize="12"/>
                             </StackPanel>
                         </Grid>
