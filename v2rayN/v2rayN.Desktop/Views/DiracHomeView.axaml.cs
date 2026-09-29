@@ -41,6 +41,17 @@ public partial class DiracHomeView : UserControl
         btnDiracCheckUpdate.Click += (_, _) => CheckUpdateRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    // Visual-test fixture only. No CoreManager or user profile is instantiated.
+    public void SetPreviewProfile(string label)
+    {
+        var profile = new PreviewProfile(label);
+        cmbDiracProfile.ItemsSource = new[] { profile };
+        cmbDiracProfile.SelectedItem = profile;
+        SetProfileCount(1);
+    }
+
+    private sealed record PreviewProfile(string Text);
+
     public void ShowSection(string section)
     {
         panelDiracHome.IsVisible = section == "home";
