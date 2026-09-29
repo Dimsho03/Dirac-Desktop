@@ -212,13 +212,13 @@
                     <Grid ColumnDefinitions="*,9,*">
                         <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall primary" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
-                                <LucideIcon Kind="FolderOpen" Size="20" StrokeWidth="1.7" Foreground="#B6D6BE"/>
+                                <LucideIcon Kind="FileText" Size="20" StrokeWidth="1.7" Foreground="#B6D6BE"/>
                                 <TextBlock Text="Из файла" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
-                                <LucideIcon Kind="ClipboardPaste" Size="20" StrokeWidth="1.7" Foreground="#AEC0BF"/>
+                                <LucideIcon Kind="Clipboard" Size="20" StrokeWidth="1.7" Foreground="#AEC0BF"/>
                                 <TextBlock Text="Из буфера" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
