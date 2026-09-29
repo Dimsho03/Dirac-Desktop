@@ -44,11 +44,14 @@ A successful TCP socket alone is NOT a successful HTTPS/TLS test.
    Test-DiracNetwork.ps1 using Mode Ordinary, CaptureBaselineOnly, and
    SaveBaselineFile pointing into a new isolated switch directory. Capture-only
    does not require the old VPN to be disconnected.
-3. Register a unique one-shot scheduled task under the local SYSTEM account to
-   call Restore-DiracNetwork.ps1 after 5-8 minutes, passing exact GuardedRoot,
-   BaselineFile, ResultFolder and Confirm false. The script checks success.ok and
-   rollback-completed.ok markers and skips a completed operation. Confirm that
-   this independent task is registered before stopping the old VPN.
+3. Register an independent one-shot SYSTEM watchdog using
+   scripts/Manage-DiracRollbackWatchdog.ps1 with exact GuardedRoot,
+   BaselineFile, ResultFolder and a unique TaskName starting with DiracRollback-.
+   DelayMinutes defaults to 7 and accepts 5-15. Try WhatIf first; then use
+   Confirm false from the elevated local controller. The task invokes
+   Restore-DiracNetwork.ps1 independently of Euler. Confirm the scheduled task
+   exists before stopping the old VPN. It skips restoration when success.ok
+   or rollback-completed.ok is already present.
 4. Disconnect the old VPN using its own manager. If an orphaned Xray has no
    controlling GUI, stop only its verified exact PID/path. Check ordinary
    connectivity using Test-DiracNetwork.ps1 in Ordinary mode with the saved
@@ -57,9 +60,11 @@ A successful TCP socket alone is NOT a successful HTTPS/TLS test.
    its imported complete TUN profile. Wait for its actual window; a 20-second
    GUI timer is not a reliable crash detector. Click Connect once. Test
    Connected mode against the exact staged Xray path and TUN name.
-6. Mark success.ok and remove the scheduled rollback task ONLY after
-   connected-mode DNS, route, direct TCP AND HTTPS checks succeed. A graphical
-   Connected label and active UDP53 are insufficient on their own.
+6. Mark success.ok ONLY after connected-mode DNS, route, direct TCP AND
+   HTTPS checks succeed. Then use Manage-DiracRollbackWatchdog.ps1 with
+   Disarm to verify live network health again before unregistering the
+   watchdog. Do not unregister it merely because a marker file exists.
+   A graphical Connected label and active UDP53 are insufficient on their own.
 
 ## Scoped rollback contract
 
@@ -83,7 +88,7 @@ and is attempted only after ordinary network verification. A restarted
 process alone is not a verified VPN; perform another connected-mode test.
 
 Rollback supports WhatIf. scripts/Test-DiracNetworkScripts.ps1 validates script
-syntax and runs nine synthetic, offline checks, including an actual WhatIf with
+syntax and runs ten synthetic, offline checks, including rollback and watchdog WhatIf with
 a synthetic baseline and dummy executables. It never changes adapters or DNS.
 
 ## Recovery ownership
