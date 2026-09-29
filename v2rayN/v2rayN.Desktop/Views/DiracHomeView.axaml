@@ -144,7 +144,7 @@
                 </StackPanel>
                 <StackPanel Grid.Row="2" Spacing="10">
                     <TextBlock Text="ПРОФИЛЬ" Foreground="#929B9F" FontSize="10" FontWeight="SemiBold"/>
-                    <ComboBox x:Name="cmbDiracProfile" MinHeight="43" HorizontalAlignment="Stretch" Background="#222527" Foreground="#F0F2F2" BorderBrush="#42484B" BorderThickness="1" CornerRadius="10"
+                    <ComboBox x:Name="cmbDiracProfile" MinHeight="43" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Stretch" Background="#222527" Foreground="#F0F2F2" BorderBrush="#42484B" BorderThickness="1" CornerRadius="10"
                               ItemsSource="{Binding StatusBarViewModel.Servers}"
                               SelectedItem="{Binding StatusBarViewModel.SelectedServer, Mode=TwoWay}"
                               DisplayMemberBinding="{Binding Text}"/>
@@ -175,13 +175,13 @@
             <StackPanel x:Name="panelDiracRouting" IsVisible="False" Spacing="17">
                 <TextBlock Text="Маршрутизация" Foreground="#F0F1F1" FontSize="23" FontWeight="Medium"/>
                 <TextBlock Text="Выберите способ обработки трафика." Foreground="#969EA4" FontSize="12" Margin="0,-8,0,8"/>
-                <Button x:Name="btnDiracRussia" Classes="diracRow selected">
+                <Button x:Name="btnDiracRussia" Classes="diracRow selected" MinWidth="310" HorizontalAlignment="Stretch">
                     <StackPanel Spacing="7">
                         <TextBlock Text="Россия напрямую" FontSize="14" FontWeight="Medium"/>
                         <TextBlock Text="Российские ресурсы открываются напрямую. Остальной трафик — через VPN." TextWrapping="Wrap" Foreground="#A5ADB3" FontSize="11"/>
                     </StackPanel>
                 </Button>
-                <Button x:Name="btnDiracFull" Classes="diracRow">
+                <Button x:Name="btnDiracFull" Classes="diracRow" MinWidth="310" HorizontalAlignment="Stretch">
                     <StackPanel Spacing="7">
                         <TextBlock Text="Полный VPN" FontSize="14" FontWeight="Medium"/>
                         <TextBlock Text="Весь поддерживаемый трафик TUN направляется через VPN." TextWrapping="Wrap" Foreground="#A5ADB3" FontSize="11"/>
