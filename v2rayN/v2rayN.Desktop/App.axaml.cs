@@ -38,7 +38,10 @@ public partial class App : Application
                 }
 
                 var view = new DiracHomeView();
-                view.SetPreviewProfile("[Custom] Dirac");
+                if (!args.Any(arg => string.Equals(arg, "--dirac-preview-no-profile", StringComparison.OrdinalIgnoreCase)))
+                {
+                    view.SetPreviewProfile("[Custom] Dirac");
+                }
                 view.SetRouting(russiaDirect: true, canChange: true, isActive: true);
                 view.SetUpdateChannel(beta: false, busy: false);
                 var stateText = Option(args, "--dirac-preview-state");
