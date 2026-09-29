@@ -73,7 +73,7 @@ function ProbeHttps([string]$url) {
     if (-not (Test-Path -LiteralPath $curl)) { return $false }
     $psi = [Diagnostics.ProcessStartInfo]::new()
     $psi.FileName = $curl
-    $psi.Arguments = '--noproxy "*" --silent --show-error --max-time 11 --output NUL --write-out "%{http_code}" "' + $url + '"'
+    $psi.Arguments = '--head --noproxy "*" --silent --show-error --max-time 11 "' + $url + '"'
     $psi.UseShellExecute = $false
     $psi.CreateNoWindow = $true
     $psi.RedirectStandardOutput = $true
@@ -84,7 +84,7 @@ function ProbeHttps([string]$url) {
         [void]$proc.Start()
         if (-not $proc.WaitForExit(14000)) { $proc.Kill(); return $false }
         $stdout = $proc.StandardOutput.ReadToEnd().Trim()
-        return ($proc.ExitCode -eq 0 -and $stdout -match '^2\d\d$|^3\d\d$')
+        return ($proc.ExitCode -eq 0 -and $stdout -match '(?m)^HTTP/\S+\s+[23]\d{2}\b')
     } catch { return $false } finally { $proc.Dispose() }
 }
 function CaptureObservation {
