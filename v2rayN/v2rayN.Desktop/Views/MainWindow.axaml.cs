@@ -390,7 +390,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             current is not EDiracDashboardState.Connecting and not EDiracDashboardState.Disconnecting,
             current == EDiracDashboardState.Connected);
         diracHome.SetUpdateChannel(_config.CheckUpdateItem.DiracBetaChannel, _diracUpdateBusy);
-        diracHome.SetProfileCount(ViewModel.ProfilesViewModel.ProfileItems.Count);
+        diracHome.SetProfileCount(ViewModel.StatusBarViewModel.Servers.Count);
         RefreshDiracNetwork(current);
     }
 
