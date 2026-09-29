@@ -10,6 +10,7 @@ namespace v2rayN.Desktop.Views;
 public partial class DiracHomeView : UserControl
 {
     private bool _canSelectProfile;
+    private int _profileCount;
     public event EventHandler? ConnectRequested;
     public event EventHandler? NetworkCheckRequested;
     public event EventHandler? ProfilesRequested;
@@ -194,6 +195,7 @@ public partial class DiracHomeView : UserControl
 
     public void SetProfileCount(int count)
     {
+        _profileCount = count;
         txtDiracProfileCount.Text = count switch
         {
             0 => "Нет профилей",
@@ -205,7 +207,7 @@ public partial class DiracHomeView : UserControl
 
     private void UpdateProfilePicker()
     {
-        var hasProfiles = txtDiracProfileCount.Text != "Нет профилей";
+        var hasProfiles = _profileCount > 0;
         cmbDiracProfile.IsEnabled = _canSelectProfile && hasProfiles;
         ToolTip.SetTip(cmbDiracProfile, !hasProfiles
             ? "Добавьте профиль из файла или буфера"
