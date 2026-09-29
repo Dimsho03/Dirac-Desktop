@@ -15,6 +15,57 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime previewDesktop)
+        {
+            var args = previewDesktop.Args ?? [];
+            if (args.Any(arg => string.Equals(arg, "--dirac-ui-preview", StringComparison.OrdinalIgnoreCase)))
+            {
+                static string Option(string[] values, string name)
+                    => values.FirstOrDefault(value => value.StartsWith(name + "=", StringComparison.OrdinalIgnoreCase))
+                        ?.Substring(name.Length + 1) ?? "";
+
+                static double Dimension(string text, double fallback, double min, double max)
+                    => double.TryParse(text, System.Globalization.NumberStyles.Float,
+                        System.Globalization.CultureInfo.InvariantCulture, out var number)
+                        ? Math.Clamp(number, min, max) : fallback;
+
+                var width = Dimension(Option(args, "--dirac-preview-width"), 550, 550, 1000);
+                var height = Dimension(Option(args, "--dirac-preview-height"), 610, 610, 1000);
+                var page = Option(args, "--dirac-preview-page").ToLowerInvariant();
+                if (page is not ("home" or "routing" or "updates" or "settings"))
+                {
+                    page = "home";
+                }
+
+                var view = new DiracHomeView();
+                view.SetPreviewProfile("[Custom] Dirac");
+                view.SetRouting(russiaDirect: true, canChange: true, isActive: true);
+                view.SetUpdateChannel(beta: false, busy: false);
+                var stateText = Option(args, "--dirac-preview-state");
+                if (!Enum.TryParse<DiracConnectionDisplay>(stateText, ignoreCase: true, out var state))
+                {
+                    state = DiracConnectionDisplay.Connected;
+                }
+                view.SetConnectionState(state);
+                view.SetRouting(russiaDirect: true, canChange: true,
+                    isActive: state == DiracConnectionDisplay.Connected);
+                view.ShowSection(page);
+
+                previewDesktop.MainWindow = new Window
+                {
+                    Title = "Dirac Desktop UI Preview (offline)",
+                    Width = width,
+                    Height = height,
+                    MinWidth = 550,
+                    MinHeight = 610,
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                    Content = view
+                };
+                base.OnFrameworkInitializationCompleted();
+                return;
+            }
+        }
+
         var viewLocator = SimpleViewLocator.Instance;
         DataTemplates.Add(viewLocator);
 
