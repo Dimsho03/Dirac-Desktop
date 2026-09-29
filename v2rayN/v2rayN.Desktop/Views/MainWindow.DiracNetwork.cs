@@ -18,7 +18,9 @@ public partial class MainWindow
     {
         if (state != EDiracDashboardState.Connected)
         {
-            _diracNetworkProbeCancellation?.Cancel();
+            var pendingProbe = _diracNetworkProbeCancellation;
+            _diracNetworkProbeCancellation = null;
+            pendingProbe?.Cancel();
             _diracNextNetworkProbeUtc = DateTime.MinValue;
             _diracLastReceivedBytes = null;
             _diracLastSentBytes = null;
@@ -117,7 +119,8 @@ public partial class MainWindow
                 cancellation.Token);
             watch.Stop();
 
-            if (GetDiracDashboardState() == EDiracDashboardState.Connected)
+            if (ReferenceEquals(_diracNetworkProbeCancellation, cancellation)
+                && GetDiracDashboardState() == EDiracDashboardState.Connected)
             {
                 diracHome.SetNetworkHealth(response.IsSuccessStatusCode
                     ? DiracNetworkHealth.Available : DiracNetworkHealth.Unavailable,
@@ -126,7 +129,8 @@ public partial class MainWindow
         }
         catch (Exception)
         {
-            if (GetDiracDashboardState() == EDiracDashboardState.Connected)
+            if (ReferenceEquals(_diracNetworkProbeCancellation, cancellation)
+                && GetDiracDashboardState() == EDiracDashboardState.Connected)
             {
                 diracHome.SetNetworkHealth(DiracNetworkHealth.Unavailable);
             }
