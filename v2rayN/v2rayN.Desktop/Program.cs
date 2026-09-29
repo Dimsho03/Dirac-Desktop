@@ -15,6 +15,14 @@ internal class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        // A visual-only preview never initializes AppManager, profile storage,
+        // Velopack, the process mutex or Xray. Safe alongside the live VPN.
+        if (args.Any(arg => string.Equals(arg, "--dirac-ui-preview", StringComparison.OrdinalIgnoreCase)))
+        {
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            return;
+        }
+
         VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
         DiracUpdateRuntime.ConfigurePersistentDataPath();
         if (DiracInstalledUpdateSmoke.TryHandle(args))
