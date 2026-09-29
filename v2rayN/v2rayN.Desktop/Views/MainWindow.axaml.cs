@@ -165,7 +165,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
 
         if (Utils.IsWindows())
         {
-            Title = $"Dirac Desktop · {Utils.GetVersion()} - {(Utils.IsAdministrator() ? ResUI.RunAsAdmin : ResUI.NotRunAsAdmin)}";
+            Title = "Dirac Desktop";
 
             if (!Design.IsDesignMode)
             {
@@ -175,7 +175,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         }
         else
         {
-            Title = $"Dirac Desktop · {Utils.GetVersion()}";
+            Title = "Dirac Desktop";
             menuAddServerViaScan.IsVisible = false;
         }
 
@@ -221,8 +221,8 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         btnBackDirac.Click += (_, _) =>
         {
             legacyWorkspace.IsVisible = false;
-            MinWidth = 500;
-            MinHeight = 545;
+            MinWidth = 550;
+            MinHeight = 610;
             Width = _diracCompactWidth;
             Height = _diracCompactHeight;
             diracHome.IsVisible = true;
