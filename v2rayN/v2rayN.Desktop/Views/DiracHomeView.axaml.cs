@@ -142,7 +142,7 @@ public partial class DiracHomeView : UserControl
         {
             DiracNetworkHealth.Checking => "Проверка сети…",
             DiracNetworkHealth.Available => "Сеть доступна",
-            DiracNetworkHealth.Unavailable => "Сеть недоступна",
+            DiracNetworkHealth.Unavailable => "Нет ответа",
             _ => "Не проверяется"
         };
         txtDiracLatency.Text = health == DiracNetworkHealth.Available && latencyMs.HasValue
