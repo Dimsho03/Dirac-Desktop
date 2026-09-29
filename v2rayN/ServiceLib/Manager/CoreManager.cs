@@ -265,13 +265,33 @@ public class CoreManager
                 try
                 {
                     await DiracWindowsDnsGuard.RestoreAsync();
+                    if (DiracWindowsDnsGuard.HasPendingRestore)
+                    {
+                        Logging.SaveLog(_tag, new InvalidOperationException(
+                            "Dirac DNS guard still has pending adapter snapshots after core stop."));
+                        if (_updateFunc is not null)
+                        {
+                            await UpdateFunc(true,
+                                "Dirac DNS restore is incomplete. Use network recovery before reconnecting.");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Logging.SaveLog(_tag, ex);
+                    if (_updateFunc is not null)
+                    {
+                        try
+                        {
+                            await UpdateFunc(true,
+                                "Dirac could not restore Windows DNS. Run network recovery before reconnecting.");
+                        }
+                        catch (Exception notifyException)
+                        {
+                            Logging.SaveLog(_tag, notifyException);
+                        }
+                    }
                 }
-
-
             }
         }
     }
