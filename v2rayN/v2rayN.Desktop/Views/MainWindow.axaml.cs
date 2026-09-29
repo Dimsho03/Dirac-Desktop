@@ -192,6 +192,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
     private void WireDiracDashboard()
     {
         diracHome.ConnectRequested += async (_, _) => await ToggleDiracConnectionAsync();
+        diracHome.NetworkCheckRequested += async (_, _) => await CheckDiracNetworkAsync(force: true);
         diracHome.ProfilesRequested += (_, _) => ShowDiracAdvancedWorkspace("profiles");
         diracHome.DiagnosticsRequested += (_, _) => ShowDiracAdvancedWorkspace("logs");
         diracHome.AdvancedRequested += (_, _) => ShowDiracAdvancedWorkspace("advanced");
@@ -390,6 +391,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             current == EDiracDashboardState.Connected);
         diracHome.SetUpdateChannel(_config.CheckUpdateItem.DiracBetaChannel, _diracUpdateBusy);
         diracHome.SetProfileCount(ViewModel.ProfilesViewModel.ProfileItems.Count);
+        RefreshDiracNetwork(current);
     }
 
     #region Event
