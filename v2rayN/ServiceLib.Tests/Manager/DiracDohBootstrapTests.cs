@@ -27,6 +27,31 @@ public class DiracDohBootstrapTests
     """)!;
 
     [Test]
+    public async Task RecognizesEmbeddedTunBeforeGuiTunToggleAndDoesNotMutateTheImportedProfile()
+    {
+        var original = Fixture();
+        var serialized = original.ToJsonString();
+        await DiracDohBootstrap.ContainsNativeTun(original).Should().BeTrue();
+        await (original.ToJsonString() == serialized).Should().BeTrue();
+
+        var temp = Path.Combine(Path.GetTempPath(), "dirac-tun-detect-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            await File.WriteAllTextAsync(temp, serialized);
+            await (await DiracDohBootstrap.ContainsNativeTunFileAsync(temp)).Should().BeTrue();
+
+            original["inbounds"]![0]!["protocol"] = "socks";
+            await DiracDohBootstrap.ContainsNativeTun(original).Should().BeFalse();
+            await File.WriteAllTextAsync(temp, original.ToJsonString());
+            await (await DiracDohBootstrap.ContainsNativeTunFileAsync(temp)).Should().BeFalse();
+        }
+        finally
+        {
+            if (File.Exists(temp)) File.Delete(temp);
+        }
+    }
+
+    [Test]
     public async Task ChangesOnlyAddressAndHost()
     {
         var node = Fixture();
