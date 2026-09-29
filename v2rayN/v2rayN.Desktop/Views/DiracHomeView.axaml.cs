@@ -44,13 +44,14 @@ public partial class DiracHomeView : UserControl
     // Visual-test fixture only. No CoreManager or user profile is instantiated.
     public void SetPreviewProfile(string label)
     {
-        var profile = new PreviewProfile(label);
-        cmbDiracProfile.ItemsSource = new[] { profile };
-        cmbDiracProfile.SelectedItem = profile;
+        // Preview is independent of MainWindowViewModel; avoid the normal
+        // DisplayMemberBinding, which expects a real StatusBar server entry.
+        var option = new ComboBoxItem { Content = label };
+        cmbDiracProfile.DisplayMemberBinding = null;
+        cmbDiracProfile.ItemsSource = new[] { option };
+        cmbDiracProfile.SelectedIndex = 0;
         SetProfileCount(1);
     }
-
-    private sealed record PreviewProfile(string Text);
 
     public void ShowSection(string section)
     {
