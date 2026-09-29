@@ -14,7 +14,7 @@
             <Setter Property="Foreground" Value="#959A9F"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="12,12"/>
+            <Setter Property="Padding" Value="9,12"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="Medium"/>
         </Style>
@@ -83,7 +83,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="157,*">
+    <Grid ColumnDefinitions="182,*">
         <!-- Left rail: monochrome, the only persistent navigation. -->
         <Border Grid.Column="0" Background="#17191B" BorderBrush="#303437" BorderThickness="0,0,1,0" Padding="13,23,12,18">
             <Grid RowDefinitions="Auto,68,Auto,Auto,Auto,Auto,*,Auto">
@@ -98,25 +98,25 @@
                 </StackPanel>
 
                 <Button Grid.Row="2" x:Name="btnDiracOverview" Classes="diracNav selected">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
                         <LucideIcon Kind="House" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Главная" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="3" x:Name="btnDiracRoutingNav" Classes="diracNav" Margin="0,6,0,0">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
                         <LucideIcon Kind="Route" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Маршрутизация" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="4" x:Name="btnDiracUpdatesNav" Classes="diracNav" Margin="0,6,0,0">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
                         <LucideIcon Kind="RefreshCcw" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Обновления" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
                 <Button Grid.Row="5" x:Name="btnDiracSettingsNav" Classes="diracNav" Margin="0,6,0,0">
-                    <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
                         <LucideIcon Kind="SlidersHorizontal" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                         <TextBlock Text="Настройки" VerticalAlignment="Center"/>
                     </StackPanel>
