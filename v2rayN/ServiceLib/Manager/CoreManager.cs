@@ -90,10 +90,32 @@ public class CoreManager
         await UpdateFunc(false, string.Format(ResUI.StartService, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")));
 
         var xrayDirectory = Utils.GetBinPath("", nameof(ECoreType.Xray));
-        var diracTunEligible = Utils.IsWindows() && mainContext.IsTunEnabled &&
-                               node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
-                               DiracPinnedCore.IsPinned(xrayDirectory) &&
+        var embeddedNativeTun = Utils.IsWindows() &&
+                                node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
+                                await DiracDohBootstrap.ContainsNativeTunFileAsync(fileName);
+
+        // Importing a complete custom Xray JSON is not the same as pressing
+        // Connect. Otherwise v2rayN's normal selected-server autostart runs its
+        // embedded TUN without enabling our DoH bootstrap or Windows DNS guard.
+        if (embeddedNativeTun && !mainContext.IsTunEnabled)
+        {
+            await CoreStop();
+            await UpdateFunc(false, "Dirac native TUN profile ready. Press Connect to start the VPN.");
+            return;
+        }
+
+        // Never fall back to an unguarded generic native TUN when the selected
+        // profile embeds its own TUN but the pinned-core or strict Dirac
+        // eligibility checks fail.
+        var diracTunEligible = embeddedNativeTun && mainContext.IsTunEnabled &&
+                               DiracPinnedCore.Matches(Path.Combine(xrayDirectory, "xray.exe"), xrayDirectory) &&
                                await DiracDohBootstrap.IsEligibleFileAsync(fileName);
+        if (embeddedNativeTun && !diracTunEligible)
+        {
+            await CoreStop();
+            await UpdateFunc(true, "Dirac TUN blocked: compatible full profile and verified pinned Xray are required.");
+            return;
+        }
 
         // Do not tear down adapters or change DNS while a separate Dirac GUI
         // still owns an active native TUN. Report the conflict instead.
