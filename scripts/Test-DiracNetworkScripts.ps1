@@ -2,8 +2,9 @@
 $ErrorActionPreference = 'Stop'
 $probe = Join-Path $PSScriptRoot 'Test-DiracNetwork.ps1'
 $rollback = Join-Path $PSScriptRoot 'Restore-DiracNetwork.ps1'
+$watchdog = Join-Path $PSScriptRoot 'Manage-DiracRollbackWatchdog.ps1'
 $failures = [Collections.Generic.List[string]]::new()
-foreach ($file in @($probe,$rollback)) {
+foreach ($file in @($probe,$rollback,$watchdog)) {
     if (-not (Test-Path -LiteralPath $file)) { throw "Required script missing: $file" }
     $tokens = $null; $parseErrors = $null
     [void][Management.Automation.Language.Parser]::ParseFile($file,[ref]$tokens,[ref]$parseErrors)
@@ -65,6 +66,11 @@ try {
         $failures.Add('rollback_whatif_must_not_mutate_network_or_create_output')
         Write-Output 'TEST_rollback_whatif=FAIL'
     } else { Write-Output 'TEST_rollback_whatif=PASS' }
+    $watchdogPlan = (& $watchdog -GuardedRoot $fakeRoot -BaselineFile $fakeBaselineFile -ResultFolder $fakeResult -TaskName 'DiracRollback-DryRunFixture001' -WhatIf | Out-String)
+    if ($watchdogPlan -notmatch 'WATCHDOG_DRY_RUN=true' -or (Test-Path $fakeResult)) {
+        $failures.Add('watchdog_whatif_must_not_create_task_or_result_directory')
+        Write-Output 'TEST_watchdog_whatif=FAIL'
+    } else { Write-Output 'TEST_watchdog_whatif=PASS' }
     if ($failures.Count -gt 0) { throw ($failures -join [Environment]::NewLine) }
-    Write-Output 'DIRAC_OFFLINE_NETWORK_CHECK_TESTS_PASS=9'
+    Write-Output 'DIRAC_OFFLINE_NETWORK_CHECK_TESTS_PASS=10'
 } finally { Remove-Item -LiteralPath $dir -Recurse -Force -ErrorAction SilentlyContinue }
