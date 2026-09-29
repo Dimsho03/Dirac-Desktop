@@ -9,6 +9,7 @@ namespace v2rayN.Desktop.Views;
 /// </summary>
 public partial class DiracHomeView : UserControl
 {
+    private bool _canSelectProfile;
     public event EventHandler? ConnectRequested;
     public event EventHandler? NetworkCheckRequested;
     public event EventHandler? ProfilesRequested;
@@ -69,6 +70,8 @@ public partial class DiracHomeView : UserControl
         var connected = state == DiracConnectionDisplay.Connected;
         btnDiracConnect.Classes.Set("connected", connected);
         diracConnectHalo.Classes.Set("connected", connected);
+        _canSelectProfile = state == DiracConnectionDisplay.Disconnected;
+        UpdateProfilePicker();
         switch (state)
         {
             case DiracConnectionDisplay.Connected:
@@ -197,7 +200,18 @@ public partial class DiracHomeView : UserControl
             1 => "1 профиль",
             _ => $"{count} профилей"
         };
-        ToolTip.SetTip(cmbDiracProfile, txtDiracProfileCount.Text);
+        UpdateProfilePicker();
+    }
+
+    private void UpdateProfilePicker()
+    {
+        var hasProfiles = txtDiracProfileCount.Text != "Нет профилей";
+        cmbDiracProfile.IsEnabled = _canSelectProfile && hasProfiles;
+        ToolTip.SetTip(cmbDiracProfile, !hasProfiles
+            ? "Добавьте профиль из файла или буфера"
+            : _canSelectProfile
+                ? "Выберите профиль для подключения"
+                : "Чтобы сменить профиль, отключите VPN");
     }
 }
 
