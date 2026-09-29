@@ -1,0 +1,45 @@
+name: Dirac UI Preview Screenshots
+
+on:
+  push:
+    branches:
+      - 'dirac-desktop/ui-visual-pass1'
+    paths:
+      - 'v2rayN/**'
+      - 'scripts/Capture-DiracUiPreview.ps1'
+      - '.github/workflows/ci-ui-visual.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build isolated Dirac UI preview
+        shell: pwsh
+        run: dotnet build .\v2rayN\v2rayN.Desktop\v2rayN.Desktop.csproj -c Release --nologo
+
+      - name: Render preview layouts without VPN
+        shell: pwsh
+        run: .\scripts\Capture-DiracUiPreview.ps1
+
+      - name: Upload preview images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dirac-ui-preview-images
+          path: ui-artifacts/*.png
+          if-no-files-found: warn
