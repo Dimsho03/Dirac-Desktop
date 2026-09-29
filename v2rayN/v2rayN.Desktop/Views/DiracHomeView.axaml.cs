@@ -41,6 +41,15 @@ public partial class DiracHomeView : UserControl
         btnDiracCheckUpdate.Click += (_, _) => CheckUpdateRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    public void SetPreviewProfile(string label)
+    {
+        var option = new ComboBoxItem { Content = label };
+        cmbDiracProfile.DisplayMemberBinding = null;
+        cmbDiracProfile.ItemsSource = new[] { option };
+        cmbDiracProfile.SelectedIndex = 0;
+        SetProfileCount(1);
+    }
+
     public void ShowSection(string section)
     {
         panelDiracHome.IsVisible = section == "home";
@@ -104,6 +113,10 @@ public partial class DiracHomeView : UserControl
         btnDiracRussia.IsEnabled = canChange;
         btnDiracFull.IsEnabled = canChange;
         txtDiracMode.Text = russiaDirect ? "Россия напрямую" : "Полный VPN";
+        if (isActive)
+        {
+            txtDiracConnectionHint.Text = $"Режим: {txtDiracMode.Text}";
+        }
         txtDiracRoutingHint.Text = !canChange
             ? "Дождитесь завершения подключения."
             : isActive
