@@ -151,12 +151,14 @@
                 </StackPanel>
                 <Border Grid.Row="2" BorderBrush="#303638" BorderThickness="0,1,0,0" Padding="0,9,0,0" Margin="0,0,0,12">
                     <StackPanel Spacing="7">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
-                                <Ellipse x:Name="diracNetworkDot" Width="6" Height="6" Fill="#77817C" VerticalAlignment="Center"/>
-                                <TextBlock x:Name="txtDiracNetwork" Text="Не проверяется" Foreground="#9CA6A7" FontSize="11" VerticalAlignment="Center"/>
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <LucideIcon x:Name="iconDiracNetwork" Kind="Wifi" Size="16" StrokeWidth="1.9" Foreground="#77817C"/>
+                                <TextBlock x:Name="txtDiracNetwork" Text="Не проверяется" Foreground="#9CA6A7" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <Button x:Name="btnDiracCheckNetwork" Grid.Column="1" Classes="diracProbe" Width="27" Height="27"
+                            <TextBlock x:Name="txtDiracCheckAge" Grid.Column="1" Foreground="#818C90" FontSize="10"
+                                       VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <Button x:Name="btnDiracCheckNetwork" Grid.Column="2" Classes="diracProbe" Width="27" Height="27"
                                     ToolTip.Tip="Проверить сеть" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                                 <LucideIcon Kind="RefreshCcw" Size="15" StrokeWidth="1.7"
                                             Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
@@ -168,11 +170,11 @@
                                 <TextBlock x:Name="txtDiracLatency" Text="—" Foreground="#E8ECEB" FontSize="12"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" Spacing="3">
-                                <TextBlock Text="ЗАГРУЗКА" Foreground="#798489" FontSize="9" ToolTip.Tip="Входящий трафик TUN за секунду"/>
+                                <LucideIcon Kind="ArrowDown" Size="12" StrokeWidth="1.8" Foreground="#87989A" ToolTip.Tip="Входящий трафик TUN за секунду"/>
                                 <TextBlock x:Name="txtDiracDownload" Text="—" Foreground="#E8ECEB" FontSize="12"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" Spacing="3">
-                                <TextBlock Text="ВЫГРУЗКА" Foreground="#798489" FontSize="9" ToolTip.Tip="Исходящий трафик TUN за секунду"/>
+                                <LucideIcon Kind="ArrowUp" Size="12" StrokeWidth="1.8" Foreground="#87989A" ToolTip.Tip="Исходящий трафик TUN за секунду"/>
                                 <TextBlock x:Name="txtDiracUpload" Text="—" Foreground="#E8ECEB" FontSize="12"/>
                             </StackPanel>
                         </Grid>
@@ -198,12 +200,6 @@
                             </StackPanel>
                         </Button>
                     </Grid>
-                    <Button x:Name="btnDiracRoutingShortcut" Classes="diracNav" Padding="0,8" HorizontalContentAlignment="Stretch">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock x:Name="txtDiracMode" Text="Россия напрямую" Foreground="#A8AFB3" FontSize="11" VerticalAlignment="Center"/>
-                            <LucideIcon Grid.Column="1" Kind="ChevronRight" Size="17" StrokeWidth="1.6" Foreground="#A8AFB3" VerticalAlignment="Center"/>
-                        </Grid>
-                    </Button>
                     <TextBlock x:Name="txtDiracProfileCount" Text="Нет профилей" IsVisible="False"/>
                 </StackPanel>
             </Grid>
