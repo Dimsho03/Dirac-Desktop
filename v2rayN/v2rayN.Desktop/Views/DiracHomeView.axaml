@@ -180,7 +180,7 @@
                         </Grid>
                     </StackPanel>
                 </Border>
-                <StackPanel Grid.Row="3" Spacing="10">
+                <StackPanel Grid.Row="3" Spacing="10" Margin="0,0,0,16">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="ПРОФИЛЬ" Foreground="#929B9F" FontSize="10" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtDiracProfileCount" Grid.Column="1" Text="Нет профилей" Foreground="#929B9F" FontSize="10"/>
@@ -194,16 +194,16 @@
                                    Margin="14,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,9,*">
-                        <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                                <LucideIcon Kind="FileUp" Size="14" StrokeWidth="1.7" Foreground="#C6CCCE"/>
-                                <TextBlock Text="Из файла" FontSize="11"/>
+                                <LucideIcon Kind="FileUp" Size="16" StrokeWidth="1.7" Foreground="#C6CCCE"/>
+                                <TextBlock Text="Из файла" FontSize="12"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
-                                <LucideIcon Kind="ClipboardPaste" Size="14" StrokeWidth="1.7" Foreground="#C6CCCE"/>
-                                <TextBlock Text="Из буфера" FontSize="11"/>
+                                <LucideIcon Kind="ClipboardPaste" Size="16" StrokeWidth="1.7" Foreground="#C6CCCE"/>
+                                <TextBlock Text="Из буфера" FontSize="12"/>
                             </StackPanel>
                         </Button>
                     </Grid>
