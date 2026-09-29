@@ -300,6 +300,14 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
                 return;
             }
 
+            if (DiracTunExclusivity.IsForeignTunActive(CoreManager.Instance.ActiveDiracRussiaDirect.HasValue))
+            {
+                NotifyDiracUpdate(
+                    "Уже работает другая копия Dirac TUN. Отключите прежний VPN перед подключением нового.",
+                    NotificationType.Warning);
+                return;
+            }
+
             if (Utils.IsWindows() && !Utils.IsAdministrator())
             {
                 NotifyDiracUpdate("Для native TUN Dirac запросит запуск от администратора.");
