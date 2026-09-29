@@ -185,10 +185,14 @@
                         <TextBlock Text="ПРОФИЛЬ" Foreground="#929B9F" FontSize="10" FontWeight="SemiBold"/>
                         <TextBlock x:Name="txtDiracProfileCount" Grid.Column="1" Text="Нет профилей" Foreground="#929B9F" FontSize="10"/>
                     </Grid>
-                    <ComboBox x:Name="cmbDiracProfile" MinHeight="43" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Stretch" Background="#222527" Foreground="#F0F2F2" BorderBrush="#42484B" BorderThickness="1" CornerRadius="8"
-                              ItemsSource="{Binding StatusBarViewModel.Servers}"
-                              SelectedItem="{Binding StatusBarViewModel.SelectedServer, Mode=TwoWay}"
-                              DisplayMemberBinding="{Binding Text}"/>
+                    <Grid>
+                        <ComboBox x:Name="cmbDiracProfile" MinHeight="43" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Stretch" Background="#222527" Foreground="#F0F2F2" BorderBrush="#42484B" BorderThickness="1" CornerRadius="8"
+                                  ItemsSource="{Binding StatusBarViewModel.Servers}"
+                                  SelectedItem="{Binding StatusBarViewModel.SelectedServer, Mode=TwoWay}"
+                                  DisplayMemberBinding="{Binding Text}"/>
+                        <TextBlock x:Name="txtDiracProfileEmpty" Text="Добавьте профиль" Foreground="#929B9F" FontSize="12"
+                                   Margin="14,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
+                    </Grid>
                     <Grid ColumnDefinitions="*,9,*">
                         <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="7">
