@@ -20,6 +20,21 @@ public static class DiracDohBootstrap
         => node is JsonValue value && value.TryGetValue<string>(out var text)
             && string.Equals(text, expected, StringComparison.Ordinal);
 
+    /// <summary>
+    /// Identify an embedded native TUN independently of the GUI's TUN toggle.
+    /// A custom profile may start its own TUN when v2rayN reloads the selected
+    /// server on startup. That must not bypass explicit Connect and the DNS guard.
+    /// </summary>
+    public static bool ContainsNativeTun(JsonNode? root)
+        => root is JsonObject && root["inbounds"] is JsonArray inbounds
+            && inbounds.OfType<JsonObject>().Any(x => Text(x["protocol"], "tun"));
+
+    public static async Task<bool> ContainsNativeTunFileAsync(string fileName, CancellationToken ct = default)
+    {
+        var root = JsonNode.Parse(await File.ReadAllTextAsync(fileName, ct));
+        return ContainsNativeTun(root);
+    }
+
     public static bool IsEligible(JsonNode? root)
     {
         if (root is not JsonObject || root["outbounds"] is not JsonArray outbounds || outbounds.Count != 1
