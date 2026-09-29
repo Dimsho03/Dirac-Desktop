@@ -190,19 +190,19 @@
                 <TextBlock Text="Новые версии приложения через GitHub Releases." TextWrapping="Wrap" Foreground="#969EA4" FontSize="12" Margin="0,-8,0,8"/>
                 <TextBlock Text="Канал обновлений" Foreground="#AAB2B7" FontSize="12"/>
                 <Grid ColumnDefinitions="*,9,*">
-                    <Button x:Name="btnDiracStable" Classes="diracRow selected" Grid.Column="0" Content="Stable" HorizontalContentAlignment="Center"/>
-                    <Button x:Name="btnDiracBeta" Classes="diracRow" Grid.Column="2" Content="Beta" HorizontalContentAlignment="Center"/>
+                    <Button x:Name="btnDiracStable" Classes="diracRow selected" Grid.Column="0" Content="Stable" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+                    <Button x:Name="btnDiracBeta" Classes="diracRow" Grid.Column="2" Content="Beta" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
                 </Grid>
-                <Button x:Name="btnDiracCheckUpdate" Classes="diracRow" Content="Проверить обновления" HorizontalContentAlignment="Center" Margin="0,8,0,0"/>
+                <Button x:Name="btnDiracCheckUpdate" Classes="diracRow" Content="Проверить обновления" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,8,0,0"/>
                 <TextBlock Text="Профили обновляются только вручную." Foreground="#858F96" FontSize="11" TextWrapping="Wrap"/>
             </StackPanel>
 
             <StackPanel x:Name="panelDiracSettings" IsVisible="False" Spacing="15">
                 <TextBlock Text="Настройки" Foreground="#F0F1F1" FontSize="23" FontWeight="Medium"/>
                 <TextBlock Text="Дополнительные возможности Dirac." Foreground="#969EA4" FontSize="12" Margin="0,-8,0,7"/>
-                <Button x:Name="btnDiracProfiles" Classes="diracRow" Content="Управление профилями"/>
-                <Button x:Name="btnDiracDiagnostics" Classes="diracRow" Content="Журнал и диагностика"/>
-                <Button x:Name="btnDiracAdvanced" Classes="diracRow" Content="Расширенные настройки v2rayN"/>
+                <Button x:Name="btnDiracProfiles" Classes="diracRow" Content="Управление профилями" HorizontalAlignment="Stretch"/>
+                <Button x:Name="btnDiracDiagnostics" Classes="diracRow" Content="Журнал и диагностика" HorizontalAlignment="Stretch"/>
+                <Button x:Name="btnDiracAdvanced" Classes="diracRow" Content="Расширенные настройки v2rayN" HorizontalAlignment="Stretch"/>
                 <TextBlock Text="Сетевые настройки не изменяются при открытии этих страниц." Foreground="#858F96" FontSize="11" TextWrapping="Wrap" Margin="2,7,0,0"/>
             </StackPanel>
         </Grid>
