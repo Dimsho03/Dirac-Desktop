@@ -1,12 +1,10 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 
 namespace v2rayN.Desktop.Views;
 
 /// <summary>
-/// First, deliberately small Dirac user-facing shell. The underlying MainWindow
-/// and upstream v2rayN views remain available as the advanced workspace.
-/// Connection state is supplied by CoreManager, never inferred from a button.
+/// Compact native Dirac shell. Presentation only: the owning MainWindow still
+/// uses its original CoreManager and view model for connection/routing/update.
 /// </summary>
 public partial class DiracHomeView : UserControl
 {
@@ -25,8 +23,12 @@ public partial class DiracHomeView : UserControl
     public DiracHomeView()
     {
         InitializeComponent();
-
         btnDiracConnect.Click += (_, _) => ConnectRequested?.Invoke(this, EventArgs.Empty);
+        btnDiracOverview.Click += (_, _) => ShowSection("home");
+        btnDiracRoutingNav.Click += (_, _) => ShowSection("routing");
+        btnDiracRoutingShortcut.Click += (_, _) => ShowSection("routing");
+        btnDiracUpdatesNav.Click += (_, _) => ShowSection("updates");
+        btnDiracSettingsNav.Click += (_, _) => ShowSection("settings");
         btnDiracProfiles.Click += (_, _) => ProfilesRequested?.Invoke(this, EventArgs.Empty);
         btnDiracDiagnostics.Click += (_, _) => DiagnosticsRequested?.Invoke(this, EventArgs.Empty);
         btnDiracAdvanced.Click += (_, _) => AdvancedRequested?.Invoke(this, EventArgs.Empty);
@@ -39,62 +41,57 @@ public partial class DiracHomeView : UserControl
         btnDiracCheckUpdate.Click += (_, _) => CheckUpdateRequested?.Invoke(this, EventArgs.Empty);
     }
 
+    public void ShowSection(string section)
+    {
+        panelDiracHome.IsVisible = section == "home";
+        panelDiracRouting.IsVisible = section == "routing";
+        panelDiracUpdates.IsVisible = section == "updates";
+        panelDiracSettings.IsVisible = section == "settings";
+        btnDiracOverview.Classes.Set("selected", section == "home");
+        btnDiracRoutingNav.Classes.Set("selected", section == "routing");
+        btnDiracUpdatesNav.Classes.Set("selected", section == "updates");
+        btnDiracSettingsNav.Classes.Set("selected", section == "settings");
+    }
+
     public void SetConnectionState(DiracConnectionDisplay state)
     {
+        var connected = state == DiracConnectionDisplay.Connected;
+        btnDiracConnect.Classes.Set("connected", connected);
+        diracConnectHalo.Classes.Set("connected", connected);
         switch (state)
         {
             case DiracConnectionDisplay.Connected:
-                txtDiracHeaderStatus.Text = "●  Подключено";
                 txtDiracConnection.Text = "Подключено";
-                txtDiracConnectionHint.Text = "Трафик TUN проходит через Dirac";
-                txtDiracDns.Text = "Локальная защита включена";
-                btnDiracConnect.Content = "⏻";
-                btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#A0FFD8");
-                btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#275B4B");
+                txtDiracConnectionHint.Text = "Соединение установлено";
+                txtDiracAction.Text = "Отключить";
                 ToolTip.SetTip(btnDiracConnect, "Отключить VPN");
                 break;
 
             case DiracConnectionDisplay.Disconnecting:
-                txtDiracHeaderStatus.Text = "◌  Отключение";
                 txtDiracConnection.Text = "Отключение…";
-                txtDiracConnectionHint.Text = "Останавливаем TUN и восстанавливаем обычную сеть";
-                txtDiracDns.Text = "Возврат обычного DNS…";
-                btnDiracConnect.Content = "⏻";
-                btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#E1B870");
-                btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#50422E");
+                txtDiracConnectionHint.Text = "Останавливаем TUN и восстанавливаем сеть";
+                txtDiracAction.Text = "Отключение";
                 ToolTip.SetTip(btnDiracConnect, "Завершение работы VPN");
                 break;
 
             case DiracConnectionDisplay.Connecting:
-                txtDiracHeaderStatus.Text = "◌  Подключение";
                 txtDiracConnection.Text = "Подключение…";
-                txtDiracConnectionHint.Text = "Запуск Xray, TUN и защищённого DNS";
-                txtDiracDns.Text = "Проверка состояния…";
-                btnDiracConnect.Content = "⏻";
-                btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#E1B870");
-                btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#50422E");
+                txtDiracConnectionHint.Text = "Запуск Xray, TUN и DNS";
+                txtDiracAction.Text = "Подключение";
                 ToolTip.SetTip(btnDiracConnect, "Отменить подключение");
                 break;
 
             case DiracConnectionDisplay.Unavailable:
-                txtDiracHeaderStatus.Text = "●  Нет соединения";
-                txtDiracConnection.Text = "Не удалось подключиться";
+                txtDiracConnection.Text = "Нет соединения";
                 txtDiracConnectionHint.Text = "Проверьте профиль или откройте журнал";
-                txtDiracDns.Text = "Состояние проверяется";
-                btnDiracConnect.Content = "⏻";
-                btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#DDA27F");
-                btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#4A342D");
-                ToolTip.SetTip(btnDiracConnect, "Отключить попытку VPN");
+                txtDiracAction.Text = "Повторить";
+                ToolTip.SetTip(btnDiracConnect, "Попробовать подключиться");
                 break;
 
             default:
-                txtDiracHeaderStatus.Text = "●  Отключено";
-                txtDiracConnection.Text = "Отключено";
-                txtDiracConnectionHint.Text = "Выберите профиль и нажмите кнопку";
-                txtDiracDns.Text = "Активируется вместе с VPN";
-                btnDiracConnect.Content = "⏻";
-                btnDiracConnect.BorderBrush = Avalonia.Media.Brush.Parse("#62DAB2");
-                btnDiracConnect.Background = Avalonia.Media.Brush.Parse("#20483F");
+                txtDiracConnection.Text = "Не подключено";
+                txtDiracConnectionHint.Text = "Выберите профиль для подключения";
+                txtDiracAction.Text = "Подключить";
                 ToolTip.SetTip(btnDiracConnect, "Подключить VPN");
                 break;
         }
@@ -106,11 +103,12 @@ public partial class DiracHomeView : UserControl
         btnDiracFull.Classes.Set("selected", !russiaDirect);
         btnDiracRussia.IsEnabled = canChange;
         btnDiracFull.IsEnabled = canChange;
+        txtDiracMode.Text = russiaDirect ? "Россия напрямую" : "Полный VPN";
         txtDiracRoutingHint.Text = !canChange
             ? "Дождитесь завершения подключения."
             : isActive
                 ? "Режим применяется к текущему подключению."
-                : "Настройка сохранится для следующего подключения.";
+                : "Выбранный режим сохранится для следующего подключения.";
     }
 
     public void SetUpdateChannel(bool beta, bool busy)
@@ -130,6 +128,7 @@ public partial class DiracHomeView : UserControl
             1 => "1 профиль",
             _ => $"{count} профилей"
         };
+        ToolTip.SetTip(cmbDiracProfile, txtDiracProfileCount.Text);
     }
 }
 
