@@ -11,6 +11,7 @@ public partial class DiracHomeView : UserControl
 {
     private bool _canSelectProfile;
     private int _profileCount;
+    private DiracConnectionDisplay _connectionState;
     public event EventHandler? ConnectRequested;
     public event EventHandler? NetworkCheckRequested;
     public event EventHandler? ProfilesRequested;
@@ -68,6 +69,7 @@ public partial class DiracHomeView : UserControl
 
     public void SetConnectionState(DiracConnectionDisplay state)
     {
+        _connectionState = state;
         var connected = state == DiracConnectionDisplay.Connected;
         btnDiracConnect.Classes.Set("connected", connected);
         diracConnectHalo.Classes.Set("connected", connected);
@@ -105,7 +107,9 @@ public partial class DiracHomeView : UserControl
 
             default:
                 txtDiracConnection.Text = "Не подключено";
-                txtDiracConnectionHint.Text = "Выберите профиль для подключения";
+                txtDiracConnectionHint.Text = _profileCount == 0
+                    ? "Добавьте профиль для подключения"
+                    : "Выберите профиль для подключения";
                 txtDiracAction.Text = "Подключить";
                 ToolTip.SetTip(btnDiracConnect, "Подключить VPN");
                 break;
@@ -203,6 +207,12 @@ public partial class DiracHomeView : UserControl
             1 => "1 профиль",
             _ => $"{count} профилей"
         };
+        if (_connectionState == DiracConnectionDisplay.Disconnected)
+        {
+            txtDiracConnectionHint.Text = count == 0
+                ? "Добавьте профиль для подключения"
+                : "Выберите профиль для подключения";
+        }
         UpdateProfilePicker();
     }
 
