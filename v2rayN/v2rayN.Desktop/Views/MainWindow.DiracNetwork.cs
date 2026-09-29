@@ -102,10 +102,14 @@ public partial class MainWindow
         {
             var address = _config.SpeedTestItem.SpeedPingTestUrl;
             if (!Uri.TryCreate(address, UriKind.Absolute, out var uri)
-                || (uri.Scheme != Uri.UriSchemeHttps && uri.Scheme != Uri.UriSchemeHttp))
+                || uri.Scheme != Uri.UriSchemeHttps)
             {
-                diracHome.SetNetworkHealth(DiracNetworkHealth.Unavailable);
-                return;
+                if (!Uri.TryCreate(Global.SpeedPingTestUrls.FirstOrDefault(), UriKind.Absolute, out uri)
+                    || uri.Scheme != Uri.UriSchemeHttps)
+                {
+                    diracHome.SetNetworkHealth(DiracNetworkHealth.Unavailable);
+                    return;
+                }
             }
 
             using var handler = new SocketsHttpHandler
