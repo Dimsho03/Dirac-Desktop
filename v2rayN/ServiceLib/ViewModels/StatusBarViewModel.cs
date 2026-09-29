@@ -291,15 +291,8 @@ public partial class StatusBarViewModel : MyReactiveObject
     {
         var lstModel = await AppManager.Instance.ProfileModels(_config.SubIndexId, "");
 
-        if (lstModel?.Count > _config.GuiItem.TrayMenuServersLimit)
-        {
-            BlServers = false;
-            return;
-        }
-
-        var models = lstModel.Select(it => new ComboItem { ID = it.IndexId, Text = it.GetSummary() }).ToList();
-
-        BlServers = true;
+        BlServers = lstModel is not null && lstModel.Count <= _config.GuiItem.TrayMenuServersLimit;
+        var models = (lstModel ?? []).Select(it => new ComboItem { ID = it.IndexId, Text = it.GetSummary() }).ToList();
         Servers.Clear();
         Servers.AddRange(models);
 
