@@ -113,12 +113,7 @@
         <Border Grid.Column="0" Background="#16191A" BorderBrush="#303437" BorderThickness="0,0,1,0" Padding="13,23,12,18">
             <Grid RowDefinitions="Auto,68,Auto,Auto,Auto,Auto,*">
                 <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center" Margin="5,0,0,0">
-                    <Viewbox Width="27" Height="27">
-                        <Canvas Width="24" Height="24">
-                            <!-- Temporary monochrome mark; the separately approved logo asset remains unchanged. -->
-                            <Path Data="M3 2V22 M7 2V22 M11 3A9 9 0 0 1 11 21" Stroke="#F1F2F2" StrokeThickness="1.9" StrokeLineCap="Round" Fill="Transparent"/>
-                        </Canvas>
-                    </Viewbox>
+                    <Image Width="34" Height="34" Source="/Assets/DiracMark.png" Stretch="Uniform" />
                     <TextBlock Text="DIRAC" FontSize="17" FontWeight="SemiBold" Foreground="#F3F3F3" VerticalAlignment="Center"/>
                 </StackPanel>
 
