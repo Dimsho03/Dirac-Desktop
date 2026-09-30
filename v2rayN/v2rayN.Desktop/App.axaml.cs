@@ -223,21 +223,6 @@ public partial class App : Application
         Logging.SaveLog("TaskScheduler_UnobservedTaskException", e.Exception);
     }
 
-    private async void MenuAddServerViaClipboardClick(object? sender, EventArgs e)
-    {
-        try
-        {
-            if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: not null })
-            {
-                AppEvents.AddServerViaClipboardRequested.Publish();
-                await Task.Delay(1000);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logging.SaveLog("MenuAddServerViaClipboardClick", ex);
-        }
-    }
 
     private async void MenuExit_Click(object? sender, EventArgs e)
     {

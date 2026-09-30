@@ -253,11 +253,8 @@
 
             <StackPanel x:Name="panelDiracSettings" IsVisible="False" Spacing="15">
                 <TextBlock Text="Настройки" Foreground="#F0F1F1" FontSize="23" FontWeight="Medium"/>
-                <TextBlock Text="Дополнительные возможности Dirac." Foreground="#969EA4" FontSize="12" Margin="0,-8,0,7"/>
-                <Button x:Name="btnDiracProfiles" Classes="diracRow" Content="Управление профилями" HorizontalAlignment="Stretch"/>
-                <Button x:Name="btnDiracDiagnostics" Classes="diracRow" Content="Журнал и диагностика" HorizontalAlignment="Stretch"/>
-                <Button x:Name="btnDiracAdvanced" Classes="diracRow" Content="Расширенные настройки v2rayN" HorizontalAlignment="Stretch"/>
-                <TextBlock Text="Сетевые настройки не изменяются при открытии этих страниц." Foreground="#858F96" FontSize="11" TextWrapping="Wrap" Margin="2,7,0,0"/>
+                <TextBlock Text="Dirac использует собственный интерфейс. Устаревшая рабочая область v2rayN отключена." Foreground="#969EA4" FontSize="12" TextWrapping="Wrap" Margin="0,-8,0,7"/>
+                <TextBlock Text="Импорт профиля, маршрутизация и обновления доступны в разделах Dirac." Foreground="#858F96" FontSize="11" TextWrapping="Wrap"/>
             </StackPanel>
         </Grid>
     </Grid>

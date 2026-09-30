@@ -1,5 +1,4 @@
 using Avalonia.Controls.Notifications;
-using DialogHostAvalonia;
 using v2rayN.Desktop.Base;
 using v2rayN.Desktop.Common;
 using v2rayN.Desktop.Manager;
@@ -10,16 +9,11 @@ namespace v2rayN.Desktop.Views;
 public partial class MainWindow : WindowBase<MainWindowViewModel>
 {
     private static Config _config;
-    private readonly SingleReplaceableDisposable _layoutBindingsDisposable = new();
     private readonly WindowNotificationManager? _manager;
-    private CheckUpdateView? _checkUpdateView;
-    private BackupAndRestoreView? _backupAndRestoreView;
     private bool _blCloseByUser = false;
     private readonly DiracAppUpdateService _diracUpdates = new();
     private bool _diracUpdateBusy;
     private bool _diracPowerBusy;
-    private double _diracCompactWidth = 550;
-    private double _diracCompactHeight = 610;
     private DateTime? _diracConnectStartedUtc;
     private readonly Avalonia.Threading.DispatcherTimer _diracDashboardTimer = new()
     {
@@ -31,82 +25,11 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         InitializeComponent();
 
         _config = AppManager.Instance.Config;
-        _manager = new WindowNotificationManager(TopLevel.GetTopLevel(this)) { MaxItems = 3, Position = NotificationPosition.TopRight };
-
-        KeyDown += MainWindow_KeyDown;
-        menuSettingsSetUWP.Click += MenuSettingsSetUWP_Click;
-        menuPromotion.Click += MenuPromotion_Click;
-        menuCheckUpdate.Click += MenuCheckUpdate_Click;
-        menuDiracCheckUpdate.Click += MenuDiracCheckUpdate_Click;
-        menuDiracStableChannel.Click += MenuDiracStableChannel_Click;
-        menuDiracBetaChannel.Click += MenuDiracBetaChannel_Click;
-        btnNewUpdate.Click += MenuDiracCheckUpdate_Click;
-        RefreshDiracUpdateChannelMenu();
+        _manager = new WindowNotificationManager(TopLevel.GetTopLevel(this)) { MaxItems = 2, Position = NotificationPosition.TopRight };
         WireDiracDashboard();
-        menuBackupAndRestore.Click += MenuBackupAndRestore_Click;
-        menuClose.Click += MenuClose_Click;
-
-        conTheme.Content ??= new ThemeSettingView();
 
         this.WhenActivated(disposables =>
         {
-            //servers
-            this.BindCommand(ViewModel, vm => vm.AddVmessServerCmd, v => v.menuAddVmessServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddVlessServerCmd, v => v.menuAddVlessServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddShadowsocksServerCmd, v => v.menuAddShadowsocksServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddSocksServerCmd, v => v.menuAddSocksServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddHttpServerCmd, v => v.menuAddHttpServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddTrojanServerCmd, v => v.menuAddTrojanServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddHysteria2ServerCmd, v => v.menuAddHysteria2Server).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddTuicServerCmd, v => v.menuAddTuicServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddWireguardServerCmd, v => v.menuAddWireguardServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddAnytlsServerCmd, v => v.menuAddAnytlsServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddNaiveServerCmd, v => v.menuAddNaiveServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddCustomServerCmd, v => v.menuAddCustomServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddCustomOutboundServerCmd, v => v.menuAddCustomOutboundServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddPolicyGroupServerCmd, v => v.menuAddPolicyGroupServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddProxyChainServerCmd, v => v.menuAddProxyChainServer).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ImportDiracProfileFileCmd, v => v.menuImportDiracProfileFile).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ImportDiracProfileClipboardCmd, v => v.menuImportDiracProfileClipboard).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddServerViaClipboardCmd, v => v.menuAddServerViaClipboard).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddServerViaScanCmd, v => v.menuAddServerViaScan).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.AddServerViaImageCmd, v => v.menuAddServerViaImage).DisposeWith(disposables);
-
-            //sub
-            this.BindCommand(ViewModel, vm => vm.SubSettingCmd, v => v.menuSubSetting).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SubUpdateCmd, v => v.menuSubUpdate).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SubUpdateViaProxyCmd, v => v.menuSubUpdateViaProxy).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SubGroupUpdateCmd, v => v.menuSubGroupUpdate).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SubGroupUpdateViaProxyCmd, v => v.menuSubGroupUpdateViaProxy).DisposeWith(disposables);
-
-            //setting
-            this.BindCommand(ViewModel, vm => vm.OptionSettingCmd, v => v.menuOptionSetting).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.RoutingSettingCmd, v => v.menuRoutingSetting).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SetDiracRussiaDirectCmd, v => v.menuDiracRussiaDirect).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.SetDiracFullVpnCmd, v => v.menuDiracFullVpn).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.DNSSettingCmd, v => v.menuDNSSetting).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.FullConfigTemplateCmd, v => v.menuFullConfigTemplate).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.GlobalHotkeySettingCmd, v => v.menuGlobalHotkeySetting).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.RebootAsAdminCmd, v => v.menuRebootAsAdmin).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.ClearServerStatisticsCmd, v => v.menuClearServerStatistics).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.OpenTheFileLocationCmd, v => v.menuOpenTheFileLocation).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.RegionalPresetDefaultCmd, v => v.menuRegionalPresetsDefault).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.RegionalPresetRussiaCmd, v => v.menuRegionalPresetsRussia).DisposeWith(disposables);
-            this.BindCommand(ViewModel, vm => vm.RegionalPresetIranCmd, v => v.menuRegionalPresetsIran).DisposeWith(disposables);
-
-            this.BindCommand(ViewModel, vm => vm.ReloadCmd, v => v.menuReload).DisposeWith(disposables);
-            this.OneWayBind(ViewModel, vm => vm.BlReloadEnabled, v => v.menuReload.IsEnabled).DisposeWith(disposables);
-            this.OneWayBind(ViewModel, vm => vm.BlNewUpdate, v => v.btnNewUpdate.IsVisible).DisposeWith(disposables);
-
-            this.OneWayBind(ViewModel, vm => vm.StatusBarViewModel, v => v.contentStatusBarView.Content).DisposeWith(disposables);
-
-            _layoutBindingsDisposable.DisposeWith(disposables);
-
-            this.WhenAnyValue(v => v.ViewModel.MainGirdOrientation)
-                .ObserveOn(RxSchedulers.MainThreadScheduler)
-                .Subscribe(UpdateLayout)
-                .DisposeWith(disposables);
-
             ViewModel.ReadTextFromClipboardInteraction.RegisterHandler(async interaction =>
             {
                 var result = await AvaUtils.GetClipboardData(this);
@@ -123,33 +46,13 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
                 interaction.SetOutput(file);
             }).DisposeWith(disposables);
 
-            ViewModel.ScanScreenInteraction.RegisterHandler(async interaction =>
-            {
-                ShowHideWindow(false);
-                await Task.Delay(200);
-                var result = QRCodeAvaloniaUtils.CaptureScreen();
-                ShowHideWindow(true);
-                interaction.SetOutput(result);
-            }).DisposeWith(disposables);
-
-            ViewModel.BrowseImageFileInteraction.RegisterHandler(async interaction =>
-            {
-                var result = await UI.OpenFileDialog(null);
-                interaction.SetOutput(result);
-            }).DisposeWith(disposables);
-
             ViewModel.ShowHideWindowInteraction.RegisterHandler(interaction =>
             {
                 ShowHideWindow(interaction.Input);
                 interaction.SetOutput(RxVoid.Default);
             }).DisposeWith(disposables);
 
-            AppEvents.SendSnackMsgRequested
-              .AsObservable()
-              .ObserveOn(RxSchedulers.MainThreadScheduler)
-              .Subscribe(async content => await DelegateSnackMsg(content))
-              .DisposeWith(disposables);
-
+            // Do not bridge upstream v2rayN snack messages into the Dirac shell.
             AppEvents.AppExitRequested
               .AsObservable()
               .ObserveOn(RxSchedulers.MainThreadScheduler)
@@ -163,28 +66,17 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
               .DisposeWith(disposables);
         });
 
-        if (Utils.IsWindows())
+        Title = "Dirac Desktop";
+        if (Utils.IsWindows() && !Design.IsDesignMode)
         {
-            Title = "Dirac Desktop";
-
-            if (!Design.IsDesignMode)
-            {
-                ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
-                HotkeyManager.Instance.Init(_config, OnHotkeyHandler);
-            }
-        }
-        else
-        {
-            Title = "Dirac Desktop";
-            menuAddServerViaScan.IsVisible = false;
+            ThreadPool.RegisterWaitForSingleObject(Program.ProgramStarted, OnProgramStarted, null, -1, false);
+            HotkeyManager.Instance.Init(_config, OnHotkeyHandler);
         }
 
         if (_config.UiItem.AutoHideStartup && Utils.IsWindows())
         {
             WindowState = WindowState.Minimized;
         }
-
-        AddHelpMenuItem();
     }
 
     // Keep the previously tested v2rayN/Xray engine intact. This first
@@ -193,9 +85,6 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
     {
         diracHome.ConnectRequested += async (_, _) => await ToggleDiracConnectionAsync();
         diracHome.NetworkCheckRequested += async (_, _) => await CheckDiracNetworkAsync(force: true);
-        diracHome.ProfilesRequested += (_, _) => ShowDiracAdvancedWorkspace("profiles");
-        diracHome.DiagnosticsRequested += (_, _) => ShowDiracAdvancedWorkspace("logs");
-        diracHome.AdvancedRequested += (_, _) => ShowDiracAdvancedWorkspace("advanced");
         diracHome.ImportFileRequested += async (_, _) =>
         {
             await ViewModel.ImportDiracProfileFileAsync();
@@ -219,48 +108,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
             RefreshDiracDashboard();
         };
         diracHome.CheckUpdateRequested += (_, _) => MenuDiracCheckUpdate_Click(diracHome, new RoutedEventArgs());
-        btnBackDirac.Click += (_, _) =>
-        {
-            legacyWorkspace.IsVisible = false;
-            MinWidth = 550;
-            MinHeight = 610;
-            Width = _diracCompactWidth;
-            Height = _diracCompactHeight;
-            diracHome.IsVisible = true;
-            RefreshDiracDashboard();
-        };
         _diracDashboardTimer.Tick += (_, _) => RefreshDiracDashboard();
-    }
-
-    private void ShowDiracAdvancedWorkspace(string section)
-    {
-        // The upstream profile editor/log workspace still needs its original
-        // larger canvas, without forcing that size on the minimal dashboard.
-        if (diracHome.IsVisible)
-        {
-            _diracCompactWidth = Width;
-            _diracCompactHeight = Height;
-        }
-        diracHome.IsVisible = false;
-        MinWidth = 1050;
-        MinHeight = 680;
-        if (Width < 1120) Width = 1120;
-        if (Height < 760) Height = 760;
-        legacyWorkspace.IsVisible = true;
-
-        if (section == "logs")
-        {
-            switch (_config.UiItem.MainGirdOrientation)
-            {
-                case EGirdOrientation.Horizontal: tabMain.SelectedIndex = 0; break;
-                case EGirdOrientation.Vertical: tabMain1.SelectedIndex = 0; break;
-                default: tabMain2.SelectedIndex = 1; break;
-            }
-        }
-        else if (section == "profiles" && _config.UiItem.MainGirdOrientation == EGirdOrientation.Tab)
-        {
-            tabMain2.SelectedIndex = 0;
-        }
     }
 
     private async Task ToggleDiracConnectionAsync()
@@ -450,69 +298,9 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         base.OnClosing(e);
     }
 
-    private async void MainWindow_KeyDown(object? sender, KeyEventArgs e)
-    {
-        if (e.KeyModifiers is KeyModifiers.Control or KeyModifiers.Meta)
-        {
-            switch (e.Key)
-            {
-                case Key.V:
-                    await AddServerViaClipboardAsync();
-                    break;
-
-                case Key.S:
-                    await ScanScreenTaskAsync();
-                    break;
-            }
-        }
-        else
-        {
-            if (e.Key == Key.F5)
-            {
-                ViewModel?.Reload();
-            }
-        }
-    }
-
-    private void MenuPromotion_Click(object? sender, RoutedEventArgs e)
-    {
-        ProcUtils.ProcessStart($"{Utils.Base64Decode(Global.PromotionUrl)}?t={DateTime.Now.Ticks}");
-    }
-
-    private void MenuSettingsSetUWP_Click(object? sender, RoutedEventArgs e)
-    {
-        ProcUtils.ProcessStart(Utils.GetBinPath("EnableLoopback.exe"));
-    }
-
-    public async Task AddServerViaClipboardAsync()
-    {
-        var clipboardData = await AvaUtils.GetClipboardData(this);
-        if (clipboardData.IsNotEmpty() && ViewModel != null)
-        {
-            await ViewModel.AddServerViaClipboardAsync(clipboardData);
-        }
-    }
-
-    public async Task ScanScreenTaskAsync()
-    {
-        ShowHideWindow(false);
-
-        await Task.Delay(200);
-
-        var bytes = QRCodeAvaloniaUtils.CaptureScreen();
-        if (bytes != null && ViewModel != null)
-        {
-            await ViewModel.ScanScreenResult(bytes);
-        }
-
-        ShowHideWindow(true);
-    }
-
     private void RefreshDiracUpdateChannelMenu()
     {
-        var beta = _config.CheckUpdateItem.DiracBetaChannel;
-        menuDiracStableChannel.IsChecked = !beta;
-        menuDiracBetaChannel.IsChecked = beta;
+        diracHome.SetUpdateChannel(_config.CheckUpdateItem.DiracBetaChannel, _diracUpdateBusy);
     }
 
     private async Task SelectDiracUpdateChannelAsync(bool beta)
@@ -534,16 +322,6 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         RefreshDiracUpdateChannelMenu();
     }
 
-    private async void MenuDiracStableChannel_Click(object? sender, RoutedEventArgs e)
-    {
-        await SelectDiracUpdateChannelAsync(beta: false);
-    }
-
-    private async void MenuDiracBetaChannel_Click(object? sender, RoutedEventArgs e)
-    {
-        await SelectDiracUpdateChannelAsync(beta: true);
-    }
-
     private void NotifyDiracUpdate(string message, NotificationType type = NotificationType.Information)
     {
         _manager?.Show(new Avalonia.Controls.Notifications.Notification("Dirac update", message, type));
@@ -557,9 +335,7 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         }
 
         _diracUpdateBusy = true;
-        menuDiracCheckUpdate.IsEnabled = false;
-        menuDiracStableChannel.IsEnabled = false;
-        menuDiracBetaChannel.IsEnabled = false;
+        RefreshDiracUpdateChannelMenu();
 
         try
         {
@@ -642,26 +418,8 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         finally
         {
             _diracUpdateBusy = false;
-            menuDiracCheckUpdate.IsEnabled = true;
-            menuDiracStableChannel.IsEnabled = true;
-            menuDiracBetaChannel.IsEnabled = true;
+            RefreshDiracUpdateChannelMenu();
         }
-    }
-
-    private void MenuCheckUpdate_Click(object? sender, RoutedEventArgs e)
-    {
-        _checkUpdateView ??= new CheckUpdateView();
-        _checkUpdateView.ViewModel = ViewModel?.CheckUpdateViewModel;
-        DialogHost.Show(_checkUpdateView);
-
-        AppEvents.HasUpdateNotified.Publish(false);
-    }
-
-    private void MenuBackupAndRestore_Click(object? sender, RoutedEventArgs e)
-    {
-        _backupAndRestoreView ??= new BackupAndRestoreView();
-        _backupAndRestoreView.ViewModel = ViewModel?.BackupAndRestoreViewModel;
-        DialogHost.Show(_backupAndRestoreView);
     }
 
     private async void MenuClose_Click(object? sender, RoutedEventArgs e)
@@ -743,115 +501,13 @@ public partial class MainWindow : WindowBase<MainWindowViewModel>
         {
             ShowHideWindow(false);
         }
-        RestoreUI();
         RefreshDiracDashboard();
         _diracDashboardTimer.Start();
     }
 
-    private void RestoreUI()
-    {
-        if (_config.UiItem.MainGirdHeight1 > 0 && _config.UiItem.MainGirdHeight2 > 0)
-        {
-            if (_config.UiItem.MainGirdOrientation == EGirdOrientation.Horizontal)
-            {
-                gridMain.ColumnDefinitions[0].Width = new GridLength(_config.UiItem.MainGirdHeight1, GridUnitType.Star);
-                gridMain.ColumnDefinitions[2].Width = new GridLength(_config.UiItem.MainGirdHeight2, GridUnitType.Star);
-            }
-            else if (_config.UiItem.MainGirdOrientation == EGirdOrientation.Vertical)
-            {
-                gridMain1.RowDefinitions[0].Height = new GridLength(_config.UiItem.MainGirdHeight1, GridUnitType.Star);
-                gridMain1.RowDefinitions[2].Height = new GridLength(_config.UiItem.MainGirdHeight2, GridUnitType.Star);
-            }
-        }
-    }
-
     private void StorageUI()
     {
-        ConfigHandler.SaveWindowSizeItem(_config, GetType().Name,
-            diracHome.IsVisible ? Width : _diracCompactWidth,
-            diracHome.IsVisible ? Height : _diracCompactHeight);
-
-        if (_config.UiItem.MainGirdOrientation == EGirdOrientation.Horizontal)
-        {
-            ConfigHandler.SaveMainGirdHeight(_config, gridMain.ColumnDefinitions[0].ActualWidth, gridMain.ColumnDefinitions[2].ActualWidth);
-        }
-        else if (_config.UiItem.MainGirdOrientation == EGirdOrientation.Vertical)
-        {
-            ConfigHandler.SaveMainGirdHeight(_config, gridMain1.RowDefinitions[0].ActualHeight, gridMain1.RowDefinitions[2].ActualHeight);
-        }
-    }
-
-    private void UpdateLayout(EGirdOrientation orientation)
-    {
-        var currentLayoutDisposables = new MultipleDisposable();
-        _layoutBindingsDisposable.Create(currentLayoutDisposables);
-
-        gridMain.IsVisible = orientation == EGirdOrientation.Horizontal;
-        gridMain1.IsVisible = orientation == EGirdOrientation.Vertical;
-        gridMain2.IsVisible = orientation == EGirdOrientation.Tab;
-
-        switch (orientation)
-        {
-            case EGirdOrientation.Horizontal:
-                this.OneWayBind(ViewModel, vm => vm.ProfilesViewModel, v => v.tabProfiles.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.MsgViewModel, v => v.tabMsgView.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ClashProxiesViewModel, v => v.tabClashProxies.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ClashConnectionsViewModel, v => v.tabClashConnections.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabMsgView.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabClashProxies.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabClashConnections.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.Bind(ViewModel, vm => vm.TabMainSelectedIndex, v => v.tabMain.SelectedIndex).DisposeWith(currentLayoutDisposables);
-                break;
-
-            case EGirdOrientation.Vertical:
-                this.OneWayBind(ViewModel, vm => vm.ProfilesViewModel, v => v.tabProfiles1.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.MsgViewModel, v => v.tabMsgView1.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ClashProxiesViewModel, v => v.tabClashProxies1.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ClashConnectionsViewModel, v => v.tabClashConnections1.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabMsgView1.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabClashProxies1.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabClashConnections1.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.Bind(ViewModel, vm => vm.TabMainSelectedIndex, v => v.tabMain1.SelectedIndex).DisposeWith(currentLayoutDisposables);
-                break;
-
-            case EGirdOrientation.Tab:
-            default:
-                this.OneWayBind(ViewModel, vm => vm.ProfilesViewModel, v => v.tabProfiles2.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.MsgViewModel, v => v.tabMsgView2.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ClashProxiesViewModel, v => v.tabClashProxies2.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ClashConnectionsViewModel, v => v.tabClashConnections2.Content).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabClashProxies2.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.OneWayBind(ViewModel, vm => vm.ShowClashUI, v => v.tabClashConnections2.IsVisible).DisposeWith(currentLayoutDisposables);
-                this.Bind(ViewModel, vm => vm.TabMainSelectedIndex, v => v.tabMain2.SelectedIndex).DisposeWith(currentLayoutDisposables);
-                break;
-        }
-
-        RestoreUI();
-    }
-
-    private void AddHelpMenuItem()
-    {
-        var coreInfo = CoreInfoManager.Instance.GetCoreInfo();
-        foreach (var it in coreInfo
-            .Where(t => t.CoreType is not ECoreType.v2fly
-                        and not ECoreType.hysteria))
-        {
-            var item = new MenuItem()
-            {
-                Tag = it.Url?.Replace(@"/releases", ""),
-                Header = string.Format(ResUI.menuWebsiteItem, it.CoreType.ToString().Replace("_", " ")).UpperFirstChar()
-            };
-            item.Click += MenuItem_Click;
-            menuHelp.Items.Add(item);
-        }
-    }
-
-    private void MenuItem_Click(object? sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem item)
-        {
-            ProcUtils.ProcessStart(item.Tag?.ToString());
-        }
+        ConfigHandler.SaveWindowSizeItem(_config, GetType().Name, Width, Height);
     }
 
     #endregion UI
