@@ -4,245 +4,266 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vms="clr-namespace:ServiceLib.ViewModels;assembly=ServiceLib"
     x:DataType="vms:MainWindowViewModel"
-    Background="#0A111D">
+    Background="#101214">
 
+    <!-- Native Lucide.Avalonia icon controls; the custom DIRAC brand mark is intentionally separate. -->
     <UserControl.Styles>
         <Style Selector="Button.diracNav">
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="Foreground" Value="#9DADBE" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="16,14" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#959A9F"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="9,12"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
         </Style>
         <Style Selector="Button.diracNav:pointerover">
-            <Setter Property="Background" Value="#1A3043" />
-            <Setter Property="Foreground" Value="#F4FAFF" />
+            <Setter Property="Background" Value="#202426"/>
+            <Setter Property="Foreground" Value="#F2F3F4"/>
         </Style>
         <Style Selector="Button.diracNav.selected">
-            <Setter Property="Background" Value="#183D3B" />
-            <Setter Property="Foreground" Value="#70F4C5" />
+            <Setter Property="Background" Value="#252A2B"/>
+            <Setter Property="Foreground" Value="#F7F8F9"/>
         </Style>
-        <Style Selector="Button.diracPrimary">
-            <Setter Property="Background" Value="#53E1AC" />
-            <Setter Property="Foreground" Value="#10231F" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="18,12" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="FontSize" Value="13" />
+        <Style Selector="Button.diracRow">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Background" Value="#1B1E20"/>
+            <Setter Property="Foreground" Value="#E8EAEB"/>
+            <Setter Property="BorderBrush" Value="#363B3F"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15,13"/>
         </Style>
-        <Style Selector="Button.diracPrimary:pointerover">
-            <Setter Property="Background" Value="#91FFD5" />
+        <Style Selector="Button.diracRow:pointerover">
+            <Setter Property="Background" Value="#24282B"/>
+            <Setter Property="BorderBrush" Value="#525A60"/>
         </Style>
-        <Style Selector="Button.diracSecondary">
-            <Setter Property="Background" Value="#1D3042" />
-            <Setter Property="Foreground" Value="#E8F1F8" />
-            <Setter Property="BorderBrush" Value="#35516A" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="16,12" />
-            <Setter Property="FontWeight" Value="SemiBold" />
+        <Style Selector="Button.diracRow.selected">
+            <Setter Property="Background" Value="#252A2B"/>
+            <Setter Property="BorderBrush" Value="#879597"/>
         </Style>
-        <Style Selector="Button.diracSecondary:pointerover">
-            <Setter Property="Background" Value="#28445A" />
+        <Style Selector="Button.diracPower">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#E8ECE9"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="56"/>
+            <Setter Property="Padding" Value="0"/>
         </Style>
-        <Style Selector="Button.diracOption">
-            <Setter Property="HorizontalContentAlignment" Value="Left" />
-            <Setter Property="Background" Value="#142436" />
-            <Setter Property="Foreground" Value="#B8C6D4" />
-            <Setter Property="BorderBrush" Value="#294054" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="14" />
-            <Setter Property="Padding" Value="16,14" />
+        <Style Selector="Button.diracPower:pointerover">
+            <Setter Property="Background" Value="#0EFFFFFF"/>
         </Style>
-        <Style Selector="Button.diracOption:pointerover">
-            <Setter Property="BorderBrush" Value="#54BEAA" />
-            <Setter Property="Background" Value="#203C47" />
+        <Style Selector="Button.diracPower.connected">
+            <Setter Property="Foreground" Value="#D8EEDD"/>
         </Style>
-        <Style Selector="Button.diracOption.selected">
-            <Setter Property="Background" Value="#1C403E" />
-            <Setter Property="BorderBrush" Value="#60D9AF" />
-            <Setter Property="Foreground" Value="#8CF4CA" />
+        <Style Selector="Border.diracHalo">
+            <Setter Property="Background" Value="#1A1E20"/>
+            <Setter Property="BorderBrush" Value="#5D6668"/>
+            <Setter Property="BoxShadow" Value="0 0 0 0 Transparent"/>
         </Style>
-        <Style Selector="Button.diracChannel">
-            <Setter Property="Background" Value="#142436" />
-            <Setter Property="Foreground" Value="#A2B2C4" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Padding" Value="16,10" />
+        <Style Selector="Border.diracHalo.connected">
+            <Setter Property="Background" Value="#1A2420"/>
+            <Setter Property="BorderBrush" Value="#92B9A0"/>
+            <Setter Property="BoxShadow" Value="0 0 24 0 #45628C72"/>
         </Style>
-        <Style Selector="Button.diracChannel.selected">
-            <Setter Property="Background" Value="#28594F" />
-            <Setter Property="Foreground" Value="#BBFFE4" />
+        <Style Selector="Button.diracProbe">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#AAB4B4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+        <Style Selector="Button.diracProbe:pointerover">
+            <Setter Property="Background" Value="#272C2D"/>
+            <Setter Property="Foreground" Value="#F1F4F2"/>
+        </Style>
+        <Style Selector="Button.diracSmall">
+            <Setter Property="Background" Value="#242A2B"/>
+            <Setter Property="Foreground" Value="#DBE3E1"/>
+            <Setter Property="BorderBrush" Value="#3C4747"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="14,10"/>
+        </Style>
+        <Style Selector="Button.diracSmall:pointerover">
+            <Setter Property="Background" Value="#303839"/>
+            <Setter Property="BorderBrush" Value="#708A80"/>
+            <Setter Property="Foreground" Value="#F5F8F6"/>
+        </Style>
+        <Style Selector="Button.diracSmall:pressed">
+            <Setter Property="Background" Value="#1E2525"/>
+        </Style>
+        <Style Selector="Button.diracSmall.primary">
+            <Setter Property="Background" Value="#294036"/>
+            <Setter Property="BorderBrush" Value="#648B71"/>
+            <Setter Property="Foreground" Value="#EAF3EC"/>
+        </Style>
+        <Style Selector="Button.diracSmall.primary:pointerover">
+            <Setter Property="Background" Value="#355345"/>
+            <Setter Property="BorderBrush" Value="#91B99C"/>
+        </Style>
+        <Style Selector="Button.diracSmall.primary:pressed">
+            <Setter Property="Background" Value="#22372C"/>
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="220,*">
-        <!-- A small, stable navigation shell, not another v2rayN settings tree. -->
-        <Border Grid.Column="0" Padding="23,30,18,22" Background="#101C2A"
-                BorderBrush="#263849" BorderThickness="0,0,1,0">
-            <Grid RowDefinitions="Auto,56,Auto,Auto,Auto,*,Auto,16,Auto">
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="11">
-                    <Border Width="42" Height="42" Background="#234F48" CornerRadius="12">
-                        <TextBlock Text="D" FontSize="24" FontWeight="Bold" Foreground="#93FDD0"
-                                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                    <StackPanel VerticalAlignment="Center" Spacing="1">
-                        <TextBlock Text="DIRAC" FontSize="23" FontWeight="Bold" Foreground="#F5FAFF"
-                                  />
-                        <TextBlock Text="DESKTOP  ·  PREVIEW" Foreground="#7695A5" FontSize="9"
-                                  />
-                    </StackPanel>
+    <Grid ColumnDefinitions="182,*">
+        <!-- Left rail: monochrome, the only persistent navigation. -->
+        <Border Grid.Column="0" Background="#16191A" BorderBrush="#303437" BorderThickness="0,0,1,0" Padding="13,23,12,18">
+            <Grid RowDefinitions="Auto,68,Auto,Auto,Auto,Auto,*">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="9" VerticalAlignment="Center" Margin="5,0,0,0">
+                    <Viewbox Width="27" Height="27">
+                        <Canvas Width="24" Height="24">
+                            <!-- Temporary monochrome mark; the separately approved logo asset remains unchanged. -->
+                            <Path Data="M3 2V22 M7 2V22 M11 3A9 9 0 0 1 11 21" Stroke="#F1F2F2" StrokeThickness="1.9" StrokeLineCap="Round" Fill="Transparent"/>
+                        </Canvas>
+                    </Viewbox>
+                    <TextBlock Text="DIRAC" FontSize="17" FontWeight="SemiBold" Foreground="#F3F3F3" VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <Button Grid.Row="2" x:Name="btnDiracOverview" Classes="diracNav selected" Content="⌂   Главная" />
-                <Button Grid.Row="3" x:Name="btnDiracProfiles" Classes="diracNav" Content="▤   Профили" Margin="0,5,0,0"/>
-                <Button Grid.Row="4" x:Name="btnDiracDiagnostics" Classes="diracNav" Content="≡   Журнал и диагностика" Margin="0,5,0,0"/>
-
-                <Border Grid.Row="6" Padding="14" CornerRadius="14" Background="#172B39">
-                    <StackPanel Spacing="7">
-                        <TextBlock Text="DIRAC CORE" Foreground="#82AAAE" FontSize="10" FontWeight="Bold"
-                                  />
-                        <TextBlock Text="Xray · Native TUN" Foreground="#D7E4EC" FontSize="12"/>
-                        <TextBlock Text="Тестовая версия интерфейса"
-                                   Foreground="#87A3B3" FontSize="11" TextWrapping="Wrap"/>
+                <Button Grid.Row="2" x:Name="btnDiracOverview" Classes="diracNav selected">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
+                        <LucideIcon Kind="House" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Главная" VerticalAlignment="Center"/>
                     </StackPanel>
-                </Border>
-                <Button Grid.Row="8" x:Name="btnDiracAdvanced" Classes="diracNav" Content="⚙   Расширенные настройки" />
+                </Button>
+                <Button Grid.Row="3" x:Name="btnDiracRoutingNav" Classes="diracNav" Margin="0,6,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
+                        <LucideIcon Kind="Route" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Маршрутизация" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Row="4" x:Name="btnDiracUpdatesNav" Classes="diracNav" Margin="0,6,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
+                        <LucideIcon Kind="RefreshCcw" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Обновления" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Row="5" x:Name="btnDiracSettingsNav" Classes="diracNav" Margin="0,6,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="9">
+                        <LucideIcon Kind="SlidersHorizontal" Size="19" StrokeWidth="1.6" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        <TextBlock Text="Настройки" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
             </Grid>
         </Border>
 
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Auto">
-            <StackPanel Margin="36,29,38,30" Spacing="21">
-                <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="Главная" FontSize="27" FontWeight="Bold" Foreground="#F0F6FA"/>
-                        <TextBlock Text="Управление подключением и маршрутизацией"
-                                   FontSize="13" Foreground="#91A7B8"/>
-                    </StackPanel>
-                    <Border Grid.Column="1" VerticalAlignment="Top" Background="#1C3539"
-                            BorderBrush="#2B6058" BorderThickness="1" CornerRadius="30"
-                            Padding="13,7">
-                        <TextBlock x:Name="txtDiracHeaderStatus" Foreground="#B4ECD8"
-                                   FontSize="12" FontWeight="SemiBold" Text="●  Отключено"/>
-                    </Border>
-                </Grid>
-
-                <Grid ColumnDefinitions="1.1*,18,0.9*">
-                    <Border Grid.Column="0" MinHeight="352" Background="#132335" BorderBrush="#284053"
-                            BorderThickness="1" CornerRadius="24" Padding="25,23">
-                        <Grid RowDefinitions="Auto,*,Auto,Auto,Auto">
-                            <TextBlock Grid.Row="0" Text="VPN-СОЕДИНЕНИЕ" FontSize="11" FontWeight="Bold"
-                                       Foreground="#7FABB5"/>
-                            <Button x:Name="btnDiracConnect" Grid.Row="1"
-                                    Width="164" Height="164" CornerRadius="90" Background="#20483F"
-                                    BorderThickness="2" BorderBrush="#62DAB2" Foreground="#AEFFDD"
-                                    FontSize="69" FontWeight="Light" Content="⏻"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                                    Margin="0,11"/>
-                            <TextBlock x:Name="txtDiracConnection" Grid.Row="2" Text="Отключено"
-                                       FontSize="26" FontWeight="Bold" Foreground="#F5FBFE"
-                                       HorizontalAlignment="Center" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtDiracConnectionHint" Grid.Row="3"
-                                       Text="Импортируйте профиль и подключайтесь"
-                                       FontSize="12" Foreground="#97B3C1" HorizontalAlignment="Center"
-                                       TextAlignment="Center" TextWrapping="Wrap"
-                                       Margin="8,9,8,15"/>
-                            <Border Grid.Row="4" CornerRadius="11" Background="#1B3443" Padding="13,10">
-                                <Grid ColumnDefinitions="Auto,*">
-                                    <TextBlock Text="◈  DNS" Foreground="#7FE3CB" FontSize="12"
-                                               FontWeight="SemiBold"/>
-                                    <TextBlock x:Name="txtDiracDns" Grid.Column="1" HorizontalAlignment="Right"
-                                               Text="Активируется вместе с VPN" Foreground="#A4BCCB" FontSize="11"/>
-                                </Grid>
-                            </Border>
-                        </Grid>
-                    </Border>
-
-                    <Border Grid.Column="2" Background="#132335" BorderBrush="#284053"
-                            BorderThickness="1" CornerRadius="24" Padding="21,22">
-                        <StackPanel Spacing="13">
-                            <TextBlock Text="МАРШРУТИЗАЦИЯ" FontSize="11" FontWeight="Bold"
-                                       Foreground="#7FABB5"/>
-                            <TextBlock Text="Выберите режим" FontSize="19" FontWeight="Bold"
-                                       Foreground="#F0F8FC" Margin="0,2,0,2"/>
-                            <Button x:Name="btnDiracRussia" Classes="diracOption selected">
-                                <StackPanel Spacing="5">
-                                    <TextBlock Text="◉   Россия напрямую" FontSize="14"
-                                               FontWeight="SemiBold"/>
-                                    <TextBlock Text="RU-сайты без VPN, остальное через сервер."
-                                               FontSize="11" TextWrapping="Wrap"/>
-                                </StackPanel>
+        <!-- Compact content pages share one actual MainWindow and its existing CoreManager. -->
+        <Grid Grid.Column="1" Margin="25,24,25,23">
+            <Grid x:Name="panelDiracHome" RowDefinitions="Auto,*,Auto,Auto">
+                <TextBlock Grid.Row="0" Text="ПОДКЛЮЧЕНИЕ" Foreground="#858D93" FontSize="10" FontWeight="SemiBold"/>
+                <StackPanel Grid.Row="1" Spacing="0" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="310">
+                    <TextBlock x:Name="txtDiracConnection" Text="Не подключено" Foreground="#F0F1F1" FontSize="25" FontWeight="Medium" TextAlignment="Center" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="txtDiracConnectionHint" Text="Выберите профиль для подключения" Foreground="#8D9499" FontSize="11" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" Margin="0,7,0,18"/>
+                    <Grid Width="158" Height="158" HorizontalAlignment="Center">
+                        <Border x:Name="diracConnectHalo" Classes="diracHalo" Width="114" Height="114" CornerRadius="57" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Button x:Name="btnDiracConnect" Classes="diracPower" Width="112" Height="112" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <LucideIcon Kind="Power" Size="30" StrokeWidth="1.5" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
                             </Button>
-                            <Button x:Name="btnDiracFull" Classes="diracOption">
-                                <StackPanel Spacing="5">
-                                    <TextBlock Text="◉   Полный VPN" FontSize="14"
-                                               FontWeight="SemiBold"/>
-                                    <TextBlock Text="Весь трафик TUN через VPN-сервер."
-                                               FontSize="11" TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Button>
-                            <TextBlock x:Name="txtDiracRoutingHint" FontSize="11" Foreground="#88ACBB"
-                                       Text="Режим сохраняется между запусками."
-                                       TextWrapping="Wrap" Margin="2,5,0,0"/>
-                        </StackPanel>
-                    </Border>
-                </Grid>
-
-                <Border Background="#132335" BorderBrush="#284053"
-                        BorderThickness="1" CornerRadius="22" Padding="22,21">
-                    <StackPanel Spacing="13">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Spacing="5">
-                                <TextBlock Text="Ваш профиль" FontSize="19" FontWeight="Bold" Foreground="#F1F7FC"/>
-                                <TextBlock Text="Конфигурация поступает только от владельца сервера."
-                                           Foreground="#91ACBB" FontSize="11" TextWrapping="Wrap"/>
+                        </Border>
+                    </Grid>
+                    <TextBlock x:Name="txtDiracAction" Text="Подключить" Foreground="#A5ABB0" FontSize="11" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                </StackPanel>
+                <Border Grid.Row="2" BorderBrush="#303638" BorderThickness="0,1,0,0" Padding="0,9,0,0" Margin="0,0,0,12">
+                    <StackPanel Spacing="7">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <LucideIcon x:Name="iconDiracNetwork" Kind="Wifi" Size="16" StrokeWidth="1.9" Foreground="#77817C"/>
+                                <TextBlock x:Name="txtDiracNetwork" Text="Не проверяется" Foreground="#9CA6A7" FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <TextBlock x:Name="txtDiracProfileCount" Grid.Column="1"
-                                       VerticalAlignment="Center" Foreground="#96C9BA" FontSize="12"
-                                       Text="Нет профилей"/>
+                            <TextBlock x:Name="txtDiracCheckAge" Grid.Column="1" Foreground="#818C90" FontSize="10"
+                                       VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <Button x:Name="btnDiracCheckNetwork" Grid.Column="2" Classes="diracProbe" Width="27" Height="27"
+                                    ToolTip.Tip="Проверить сеть" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <LucideIcon Kind="RefreshCcw" Size="15" StrokeWidth="1.7"
+                                            Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                            </Button>
                         </Grid>
-                        <ComboBox x:Name="cmbDiracProfile" MinHeight="44"
-                                  Background="#20354A" Foreground="#E8F5F8"
-                                  HorizontalAlignment="Stretch"
+                        <Grid ColumnDefinitions="*,*,*">
+                            <StackPanel Grid.Column="0" Spacing="3">
+                                <TextBlock Text="ЗАДЕРЖКА" Foreground="#798489" FontSize="9" ToolTip.Tip="Время ответа HTTPS через текущую сеть"/>
+                                <TextBlock x:Name="txtDiracLatency" Text="—" Foreground="#E8ECEB" FontSize="12"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="3">
+                                <LucideIcon Kind="ArrowDown" Size="12" StrokeWidth="1.8" Foreground="#87989A" ToolTip.Tip="Входящий трафик TUN за секунду"/>
+                                <TextBlock x:Name="txtDiracDownload" Text="—" Foreground="#E8ECEB" FontSize="12"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="3">
+                                <LucideIcon Kind="ArrowUp" Size="12" StrokeWidth="1.8" Foreground="#87989A" ToolTip.Tip="Исходящий трафик TUN за секунду"/>
+                                <TextBlock x:Name="txtDiracUpload" Text="—" Foreground="#E8ECEB" FontSize="12"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                <StackPanel Grid.Row="3" Spacing="10" Margin="0,0,0,16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="ПРОФИЛЬ" Foreground="#929B9F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="txtDiracProfileCount" Grid.Column="1" Text="Нет профилей" Foreground="#929B9F" FontSize="10"/>
+                    </Grid>
+                    <Grid>
+                        <ComboBox x:Name="cmbDiracProfile" MinHeight="43" FontFamily="Segoe UI" FontSize="12" HorizontalAlignment="Stretch" Background="#222527" Foreground="#F0F2F2" BorderBrush="#42484B" BorderThickness="1" CornerRadius="8"
                                   ItemsSource="{Binding StatusBarViewModel.Servers}"
                                   SelectedItem="{Binding StatusBarViewModel.SelectedServer, Mode=TwoWay}"
                                   DisplayMemberBinding="{Binding Text}"/>
-                        <Grid ColumnDefinitions="*,12,*">
-                            <Button Grid.Column="0" x:Name="btnDiracImportFile" Classes="diracPrimary"
-                                    Content="＋  Импорт из файла"/>
-                            <Button Grid.Column="2" x:Name="btnDiracImportClipboard" Classes="diracSecondary"
-                                    Content="▤  Из буфера обмена"/>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <Border Background="#132335" BorderBrush="#284053"
-                        BorderThickness="1" CornerRadius="22" Padding="22,20">
-                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="22">
-                        <StackPanel Spacing="7">
-                            <TextBlock Text="Обновления приложения" FontSize="18" FontWeight="Bold"
-                                       Foreground="#F1F7FC"/>
-                            <TextBlock Text="GitHub Releases · без обновления ваших профилей"
-                                       FontSize="11" Foreground="#91ACBB" TextWrapping="Wrap"/>
-                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-                                <Button x:Name="btnDiracStable" Classes="diracChannel selected" Content="Stable"/>
-                                <Button x:Name="btnDiracBeta" Classes="diracChannel" Content="Beta"/>
-                            </StackPanel>
-                        </StackPanel>
-                        <Button x:Name="btnDiracCheckUpdate" Grid.Column="1"
-                                Classes="diracSecondary" Content="Проверить обновления"
-                                VerticalAlignment="Center"/>
+                        <TextBlock x:Name="txtDiracProfileEmpty" Text="Добавьте профиль" Foreground="#929B9F" FontSize="12"
+                                   Margin="14,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"/>
                     </Grid>
-                </Border>
-                <TextBlock Text="DIRAC DESKTOP  ·  ПРЕДВАРИТЕЛЬНЫЙ ИНТЕРФЕЙС  ·  WINDOWS IPv4 TUN"
-                           HorizontalAlignment="Center" Foreground="#537284"
-                           FontSize="10"/>
+                    <Grid ColumnDefinitions="*,9,*">
+                        <Button x:Name="btnDiracImportFile" Grid.Column="0" Classes="diracSmall primary" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
+                                <LucideIcon Kind="FileText" Size="20" StrokeWidth="1.7" Foreground="#B6D6BE"/>
+                                <TextBlock Text="Из файла" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="btnDiracImportClipboard" Grid.Column="2" Classes="diracSmall" MinHeight="44" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Spacing="10">
+                                <LucideIcon Kind="Clipboard" Size="20" StrokeWidth="1.7" Foreground="#AEC0BF"/>
+                                <TextBlock Text="Из буфера" FontSize="12" FontWeight="Medium" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+
+            <StackPanel x:Name="panelDiracRouting" IsVisible="False" Spacing="17">
+                <TextBlock Text="Маршрутизация" Foreground="#F0F1F1" FontSize="23" FontWeight="Medium"/>
+                <TextBlock Text="Выберите способ обработки трафика." Foreground="#969EA4" FontSize="12" Margin="0,-8,0,8"/>
+                <Button x:Name="btnDiracRussia" Classes="diracRow selected" MinWidth="310" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="Россия напрямую" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="Российские ресурсы открываются напрямую. Остальной трафик — через VPN." TextWrapping="Wrap" Foreground="#A5ADB3" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnDiracFull" Classes="diracRow" MinWidth="310" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="Полный VPN" FontSize="14" FontWeight="Medium"/>
+                        <TextBlock Text="Весь поддерживаемый трафик TUN направляется через VPN." TextWrapping="Wrap" Foreground="#A5ADB3" FontSize="11"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock x:Name="txtDiracRoutingHint" Foreground="#858F96" FontSize="11" TextWrapping="Wrap" Margin="2,5,0,0" Text="Режим сохраняется между запусками."/>
             </StackPanel>
-        </ScrollViewer>
+
+            <StackPanel x:Name="panelDiracUpdates" IsVisible="False" Spacing="17">
+                <TextBlock Text="Обновления" Foreground="#F0F1F1" FontSize="23" FontWeight="Medium"/>
+                <TextBlock Text="Новые версии приложения через GitHub Releases." TextWrapping="Wrap" Foreground="#969EA4" FontSize="12" Margin="0,-8,0,8"/>
+                <TextBlock Text="Канал обновлений" Foreground="#AAB2B7" FontSize="12"/>
+                <Grid ColumnDefinitions="*,9,*">
+                    <Button x:Name="btnDiracStable" Classes="diracRow selected" Grid.Column="0" Content="Stable" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+                    <Button x:Name="btnDiracBeta" Classes="diracRow" Grid.Column="2" Content="Beta" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+                </Grid>
+                <Button x:Name="btnDiracCheckUpdate" Classes="diracRow" Content="Проверить обновления" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,8,0,0"/>
+                <TextBlock Text="Профили обновляются только вручную." Foreground="#858F96" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <StackPanel x:Name="panelDiracSettings" IsVisible="False" Spacing="15">
+                <TextBlock Text="Настройки" Foreground="#F0F1F1" FontSize="23" FontWeight="Medium"/>
+                <TextBlock Text="Дополнительные возможности Dirac." Foreground="#969EA4" FontSize="12" Margin="0,-8,0,7"/>
+                <Button x:Name="btnDiracProfiles" Classes="diracRow" Content="Управление профилями" HorizontalAlignment="Stretch"/>
+                <Button x:Name="btnDiracDiagnostics" Classes="diracRow" Content="Журнал и диагностика" HorizontalAlignment="Stretch"/>
+                <Button x:Name="btnDiracAdvanced" Classes="diracRow" Content="Расширенные настройки v2rayN" HorizontalAlignment="Stretch"/>
+                <TextBlock Text="Сетевые настройки не изменяются при открытии этих страниц." Foreground="#858F96" FontSize="11" TextWrapping="Wrap" Margin="2,7,0,0"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

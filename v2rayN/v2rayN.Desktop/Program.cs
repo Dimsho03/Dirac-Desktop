@@ -15,6 +15,12 @@ internal class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        if (args.Any(arg => string.Equals(arg, "--dirac-ui-preview", StringComparison.OrdinalIgnoreCase)))
+        {
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            return;
+        }
+
         VelopackApp.Build().SetAutoApplyOnStartup(false).Run();
         DiracUpdateRuntime.ConfigurePersistentDataPath();
         if (DiracInstalledUpdateSmoke.TryHandle(args))

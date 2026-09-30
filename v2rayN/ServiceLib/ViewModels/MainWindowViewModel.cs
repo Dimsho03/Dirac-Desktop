@@ -512,7 +512,9 @@ public partial class MainWindowViewModel : MyReactiveObject
             }
             await RefreshSubscriptions();
             await RefreshServersDispatcherAsync();
-            NoticeManager.Instance.Enqueue("Dirac profile imported. RU-direct is available in TUN mode.");
+            NoticeManager.Instance.Enqueue(hadDefault
+                ? "Профиль добавлен. Выберите его в списке перед подключением."
+                : "Профиль добавлен и выбран для подключения.");
         }
         catch (InvalidDataException)
         {
@@ -541,7 +543,9 @@ public partial class MainWindowViewModel : MyReactiveObject
             }
             await RefreshSubscriptions();
             await RefreshServersDispatcherAsync();
-            NoticeManager.Instance.Enqueue("Dirac profile imported. RU-direct is available in TUN mode.");
+            NoticeManager.Instance.Enqueue(hadDefault
+                ? "Профиль добавлен. Выберите его в списке перед подключением."
+                : "Профиль добавлен и выбран для подключения.");
         }
         catch (InvalidDataException)
         {

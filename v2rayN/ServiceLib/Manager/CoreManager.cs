@@ -90,10 +90,40 @@ public class CoreManager
         await UpdateFunc(false, string.Format(ResUI.StartService, DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")));
 
         var xrayDirectory = Utils.GetBinPath("", nameof(ECoreType.Xray));
-        var diracTunEligible = Utils.IsWindows() && mainContext.IsTunEnabled &&
-                               node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
-                               DiracPinnedCore.IsPinned(xrayDirectory) &&
+        var embeddedNativeTun = Utils.IsWindows() &&
+                                node.ConfigType == EConfigType.Custom && node.CoreType == ECoreType.Xray &&
+                                await DiracDohBootstrap.ContainsNativeTunFileAsync(fileName);
+
+        // Importing a complete custom Xray JSON is not the same as pressing
+        // Connect. Otherwise v2rayN's normal selected-server autostart runs its
+        // embedded TUN without enabling our DoH bootstrap or Windows DNS guard.
+        if (embeddedNativeTun && !mainContext.IsTunEnabled)
+        {
+            await CoreStop();
+            await UpdateFunc(false, "Dirac native TUN profile ready. Press Connect to start the VPN.");
+            return;
+        }
+
+        // Never fall back to an unguarded generic native TUN when the selected
+        // profile embeds its own TUN but the pinned-core or strict Dirac
+        // eligibility checks fail.
+        var diracTunEligible = embeddedNativeTun && mainContext.IsTunEnabled &&
+                               DiracPinnedCore.Matches(Path.Combine(xrayDirectory, "xray.exe"), xrayDirectory) &&
                                await DiracDohBootstrap.IsEligibleFileAsync(fileName);
+        if (embeddedNativeTun && !diracTunEligible)
+        {
+            await CoreStop();
+            await UpdateFunc(true, "Dirac TUN blocked: compatible full profile and verified pinned Xray are required.");
+            return;
+        }
+
+        // Do not tear down adapters or change DNS while a separate Dirac GUI
+        // still owns an active native TUN. Report the conflict instead.
+        if (diracTunEligible && DiracTunExclusivity.IsForeignTunActive(ActiveDiracRussiaDirect.HasValue))
+        {
+            await UpdateFunc(true, "Another Dirac TUN is active. Disconnect the previous VPN before starting this copy.");
+            return;
+        }
 
         await CoreStop();
         await Task.Delay(100);
@@ -147,7 +177,9 @@ public class CoreManager
         if (diracDnsGuardApplied && (_processService is null || _processService.HasExited))
         {
             await CoreStop();
-            await UpdateFunc(true, "Dirac TUN core failed to start; DNS settings were restored.");
+            await UpdateFunc(true, DiracWindowsDnsGuard.HasPendingRestore
+                ? "Dirac TUN failed to start and DNS restore is incomplete; use network recovery."
+                : "Dirac TUN core failed to start; original DNS settings were restored.");
             return;
         }
 
@@ -255,13 +287,33 @@ public class CoreManager
                 try
                 {
                     await DiracWindowsDnsGuard.RestoreAsync();
+                    if (DiracWindowsDnsGuard.HasPendingRestore)
+                    {
+                        Logging.SaveLog(_tag, new InvalidOperationException(
+                            "Dirac DNS guard still has pending adapter snapshots after core stop."));
+                        if (_updateFunc is not null)
+                        {
+                            await UpdateFunc(true,
+                                "Dirac DNS restore is incomplete. Use network recovery before reconnecting.");
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     Logging.SaveLog(_tag, ex);
+                    if (_updateFunc is not null)
+                    {
+                        try
+                        {
+                            await UpdateFunc(true,
+                                "Dirac could not restore Windows DNS. Run network recovery before reconnecting.");
+                        }
+                        catch (Exception notifyException)
+                        {
+                            Logging.SaveLog(_tag, notifyException);
+                        }
+                    }
                 }
-
-
             }
         }
     }
