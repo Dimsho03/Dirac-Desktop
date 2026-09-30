@@ -14,9 +14,6 @@ public partial class DiracHomeView : UserControl
     private DiracConnectionDisplay _connectionState;
     public event EventHandler? ConnectRequested;
     public event EventHandler? NetworkCheckRequested;
-    public event EventHandler? ProfilesRequested;
-    public event EventHandler? DiagnosticsRequested;
-    public event EventHandler? AdvancedRequested;
     public event EventHandler? ImportFileRequested;
     public event EventHandler? ImportClipboardRequested;
     public event EventHandler? RussiaDirectRequested;
@@ -34,9 +31,6 @@ public partial class DiracHomeView : UserControl
         btnDiracRoutingNav.Click += (_, _) => ShowSection("routing");
         btnDiracUpdatesNav.Click += (_, _) => ShowSection("updates");
         btnDiracSettingsNav.Click += (_, _) => ShowSection("settings");
-        btnDiracProfiles.Click += (_, _) => ProfilesRequested?.Invoke(this, EventArgs.Empty);
-        btnDiracDiagnostics.Click += (_, _) => DiagnosticsRequested?.Invoke(this, EventArgs.Empty);
-        btnDiracAdvanced.Click += (_, _) => AdvancedRequested?.Invoke(this, EventArgs.Empty);
         btnDiracImportFile.Click += (_, _) => ImportFileRequested?.Invoke(this, EventArgs.Empty);
         btnDiracImportClipboard.Click += (_, _) => ImportClipboardRequested?.Invoke(this, EventArgs.Empty);
         btnDiracRussia.Click += (_, _) => RussiaDirectRequested?.Invoke(this, EventArgs.Empty);
