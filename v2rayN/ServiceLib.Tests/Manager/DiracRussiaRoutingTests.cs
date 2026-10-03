@@ -78,7 +78,7 @@ public class DiracRussiaRoutingTests
         };
         foreach (var domain in mustBeDirect)
         {
-            await ArrayContains(rules[2]!["domain"], domain).Should().BeTrue();
+            await ArrayContains(rules[3]!["domain"], domain).Should().BeTrue();
         }
         await ArrayContains(rules[1]!["process"], "RvControlSvc.exe").Should().BeTrue();
         await (rules[1]!["outboundTag"]!.GetValue<string>() == direct).Should().BeTrue();
