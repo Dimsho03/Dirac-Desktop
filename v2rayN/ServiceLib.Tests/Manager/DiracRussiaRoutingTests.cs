@@ -80,12 +80,14 @@ public class DiracRussiaRoutingTests
         {
             await ArrayContains(rules[2]!["domain"], domain).Should().BeTrue();
         }
-        await (rules[2]!["outboundTag"]!.GetValue<string>() == direct).Should().BeTrue();
-        await ArrayContains(rules[3]!["domain"], "geosite:ru-available-only-inside").Should().BeTrue();
-        await ArrayContains(rules[5]!["domain"], "geosite:ru-blocked").Should().BeTrue();
-        await ArrayContains(rules[7]!["domain"], "geosite:category-ru").Should().BeTrue();
-        await ArrayContains(rules[8]!["ip"], "geoip:ru").Should().BeTrue();
-        await (rules[9]!["outboundTag"]!.GetValue<string>() == "dirac-enc-test").Should().BeTrue();
+        await ArrayContains(rules[1]!["process"], "RvControlSvc.exe").Should().BeTrue();
+        await (rules[1]!["outboundTag"]!.GetValue<string>() == direct).Should().BeTrue();
+        await (rules[3]!["outboundTag"]!.GetValue<string>() == direct).Should().BeTrue();
+        await ArrayContains(rules[4]!["domain"], "geosite:ru-available-only-inside").Should().BeTrue();
+        await ArrayContains(rules[6]!["domain"], "geosite:ru-blocked").Should().BeTrue();
+        await ArrayContains(rules[8]!["domain"], "geosite:category-ru").Should().BeTrue();
+        await ArrayContains(rules[9]!["ip"], "geoip:ru").Should().BeTrue();
+        await (rules[10]!["outboundTag"]!.GetValue<string>() == "dirac-enc-test").Should().BeTrue();
 
         await (config["outbounds"]!.AsArray().Count == 2).Should().BeTrue();
         await JsonNode.DeepEquals(config["outbounds"]![0], originalVless).Should().BeTrue();
@@ -102,14 +104,14 @@ public class DiracRussiaRoutingTests
         var rules = config["routing"]!["rules"]!.AsArray();
         foreach (var name in new[] {"geosite:telegram","geosite:youtube","geosite:discord","geosite:openai"})
         {
-            await ArrayContains(rules[4]!["domain"], name).Should().BeTrue();
+            await ArrayContains(rules[5]!["domain"], name).Should().BeTrue();
         }
-        await (rules[4]!["outboundTag"]!.GetValue<string>() == "dirac-enc-test").Should().BeTrue();
-        await ArrayContains(rules[6]!["ip"], "geoip:telegram").Should().BeTrue();
-        await ArrayContains(rules[6]!["ip"], "geoip:ru-blocked").Should().BeTrue();
-        await (rules[6]!["outboundTag"]!.GetValue<string>() == "dirac-enc-test").Should().BeTrue();
-        await (rules[8]!["outboundTag"]!.GetValue<string>() == DiracRussiaRouting.DirectOutboundTag).Should().BeTrue();
-        await ArrayContains(rules[8]!["ip"], "geoip:ru").Should().BeTrue();
+        await (rules[5]!["outboundTag"]!.GetValue<string>() == "dirac-enc-test").Should().BeTrue();
+        await ArrayContains(rules[7]!["ip"], "geoip:telegram").Should().BeTrue();
+        await ArrayContains(rules[7]!["ip"], "geoip:ru-blocked").Should().BeTrue();
+        await (rules[7]!["outboundTag"]!.GetValue<string>() == "dirac-enc-test").Should().BeTrue();
+        await (rules[9]!["outboundTag"]!.GetValue<string>() == DiracRussiaRouting.DirectOutboundTag).Should().BeTrue();
+        await ArrayContains(rules[9]!["ip"], "geoip:ru").Should().BeTrue();
     }
 
     [Test]
@@ -119,11 +121,11 @@ public class DiracRussiaRoutingTests
         await DiracRussiaRouting.TryApply(config).Should().BeTrue();
         var rules = config["routing"]!["rules"]!.AsArray();
 
-        for (var i = 1; i <= 9; i++)
+        for (var i = 1; i <= 10; i++)
         {
             await ArrayContains(rules[i]!["inboundTag"], DiracRussiaRouting.TunTag).Should().BeTrue();
         }
-        await ArrayContains(rules[10]!["inboundTag"], DiracRussiaRouting.TunTag).Should().BeTrue();
+        await ArrayContains(rules[11]!["inboundTag"], DiracRussiaRouting.TunTag).Should().BeTrue();
         var sniffing = config["inbounds"]![1]!["sniffing"]!;
         await sniffing["routeOnly"]!.GetValue<bool>().Should().BeTrue();
         await ArrayContains(sniffing["destOverride"], "http").Should().BeTrue();
