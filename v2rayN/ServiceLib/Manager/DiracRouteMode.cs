@@ -23,7 +23,7 @@ public static class DiracRouteMode
         ["type"] = "field",
         ["inboundTag"] = new JsonArray(JsonValue.Create(DiracRussiaRouting.TunTag)),
         ["process"] = new JsonArray(
-            DiracRussiaRouting.DirectBypassProcesses.Select(JsonValue.Create).ToArray()),
+            DiracRussiaRouting.DirectBypassProcesses.Select(x => JsonValue.Create(x)).ToArray()),
         ["outboundTag"] = outbound
     };
 
