@@ -18,6 +18,15 @@ public static class DiracRouteMode
         ["outboundTag"] = outbound
     };
 
+    private static JsonObject DirectProcessRule(string outbound) => new()
+    {
+        ["type"] = "field",
+        ["inboundTag"] = new JsonArray(JsonValue.Create(DiracRussiaRouting.TunTag)),
+        ["process"] = new JsonArray(
+            DiracRussiaRouting.DirectBypassProcesses.Select(JsonValue.Create).ToArray()),
+        ["outboundTag"] = outbound
+    };
+
     /// <summary>
     /// Full VPN overrides every TUN and local-DNS rule before existing rules.
     /// Other (SOCKS/HTTP) inbounds retain their pre-existing routing rules.
@@ -37,6 +46,7 @@ public static class DiracRouteMode
         var rules = new JsonArray
         {
             InboundRule(DiracRussiaRouting.DnsInboundTag, outboundTag),
+            DirectProcessRule(DiracRussiaRouting.DirectOutboundTag),
             InboundRule(DiracRussiaRouting.TunTag, outboundTag)
         };
 
@@ -51,6 +61,12 @@ public static class DiracRouteMode
         }
 
         routing["rules"] = rules;
+        obj["outbounds"]!.AsArray().Add(new JsonObject
+        {
+            ["tag"] = DiracRussiaRouting.DirectOutboundTag,
+            ["protocol"] = "freedom",
+            ["settings"] = new JsonObject()
+        });
         return true;
     }
 
