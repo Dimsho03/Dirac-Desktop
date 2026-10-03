@@ -43,6 +43,16 @@ public static class DiracRussiaRouting
         "domain:googlevideo.com", "domain:discord.media"
     ];
 
+    // Overlay/LAN clients such as Radmin VPN must establish their own physical
+    // transport outside Dirac. If their control/service sockets are captured by
+    // the TUN, NAT traversal can fail and Radmin falls back to a high-latency relay.
+    public static readonly IReadOnlyList<string> DirectBypassProcesses =
+    [
+        "RvControlSvc.exe",
+        "rvpn_launcher.exe",
+        "RvRvpnGui.exe"
+    ];
+
     private static bool Text(JsonNode? node, string expected)
         => node is JsonValue value && value.TryGetValue<string>(out var text)
             && string.Equals(text, expected, StringComparison.Ordinal);
@@ -130,6 +140,13 @@ public static class DiracRussiaRouting
                 ["type"] = "field",
                 ["inboundTag"] = Strings([DnsInboundTag]),
                 ["outboundTag"] = mainTag
+            },
+            new JsonObject
+            {
+                ["type"] = "field",
+                ["inboundTag"] = Strings([TunTag]),
+                ["process"] = Strings(DirectBypassProcesses),
+                ["outboundTag"] = DirectOutboundTag
             },
             TunRule(DirectOutboundTag, "ip", ["geoip:private"]),
             TunRule(DirectOutboundTag, "domain", CriticalRussianDomains),
